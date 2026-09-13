@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Click any hub to filter the page : bubble size is pieces per hour",
+                    "value": "Click any hub to filter the page. Bubble size is pieces per hour",
                     "textStyle": {
                       "fontFamily": "'Segoe UI', wf_segoe-ui_normal, helvetica, arial, sans-serif",
                       "fontSize": "15pt",

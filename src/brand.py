@@ -494,10 +494,10 @@ def network_map(hubs, w=944, h=540, lon0=-170, lon1=158, lat0=-46, lat1=76,
     d = ImageDraw.Draw(im, 'RGBA')
 
     lf = _f(int(W / 62), False)
-    items = [('dot', ORANGE, 'Sorting hub : bubble size is pieces per hour'),
+    items = [('dot', ORANGE, 'Sorting hub, bubble size is pieces per hour'),
              ('line', ORANGE, 'Routes from Memphis'),
              ('line', VIOLET, 'Europe to Asia')] if bubbles else [
-             ('dot', ORANGE, 'Click a hub to filter the page : size is pieces per hour'),
+             ('dot', ORANGE, 'Click a hub to filter the page, size is pieces per hour'),
              ('line', ORANGE, 'Routes from Memphis'),
              ('line', VIOLET, 'Europe to Asia')]
     pad = W * 0.014

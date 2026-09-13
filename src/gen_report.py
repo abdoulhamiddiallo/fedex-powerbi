@@ -19,7 +19,9 @@ RES  = os.path.join(REP, 'StaticResources', 'RegisteredResources')
 TITLE = 'MERIDIAN'
 SUB   = 'FedEx Global Network Intelligence'
 THEME = 'ThemeMeridian'
-LOGO_SRC = '/root/.claude/uploads/cd084ff7-7210-5a13-a830-25bf044b73be/7018556a-image.jpg'
+# The FedEx wordmark ships with the repository so the build is portable. Without it the
+# pages would reference an asset that no longer exists, and check.py would stop the build.
+LOGO_SRC = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'fedex-wordmark.jpg')
 
 NAV = [
     ('p1', 'Network Pulse', 'pulse',  'NETWORK'),
@@ -223,7 +225,7 @@ def page1():
     text(pg, X0 + 20, CY + 14, a - 40, 32,
          [('THE GLOBAL SORTING NETWORK', 19, INK, FD)], 'left')
     text(pg, X0 + 20, CY + 46, a - 40, 28,
-         [('Click any hub to filter the page : bubble size is pieces per hour', 15, MUTED, FT)],
+         [('Click any hub to filter the page. Bubble size is pieces per hour', 15, MUTED, FT)],
          'left')
     table(pg, X0 + a + 16, CY, b, TOPH,
           ['#D_Hub.Hub', 'Metrics.Sort capacity', 'Metrics.Share'],
@@ -251,7 +253,7 @@ AC_ART = [('B777F · 767F · A300-600', 'wide2', 'ac_wide2.png'),
 def page2():
     pg = Page('p2', 'Air Fleet')
     frame(pg, 'p2', 'Air Fleet',
-          'Every aircraft, its maximum payload and how it is held : at 31 May 2026',
+          'Every aircraft, its maximum payload and how it is held, at 31 May 2026',
           filt='#D_FiscalYear.FiscalYearShort', flabel='FISCAL YEAR',
           fvfilter=('#D_FiscalYear.IsFleet', 1, 0),
           fwidth=slicer_width('#D_FiscalYear.FiscalYearShort', ('#D_FiscalYear.IsFleet', 1)))
@@ -377,7 +379,7 @@ def page4():
 def page5():
     pg = Page('p5', 'Climate')
     frame(pg, 'p5', 'Climate and Fuel',
-          'Carbon-neutral operations by 2040 : where the emissions stand and how fast intensity is falling',
+          'Carbon-neutral operations by 2040. Where the emissions stand, and how fast intensity is falling',
           filt='#D_FiscalYear.FiscalYearShort', flabel='FISCAL YEAR',
           fvfilter=('#D_FiscalYear.IsClimate', 1, 0),
           fwidth=slicer_width('#D_FiscalYear.FiscalYearShort', ('#D_FiscalYear.IsClimate', 1)))
@@ -459,7 +461,7 @@ def page6():
 def page7():
     pg = Page('p7', 'Energy')
     frame(pg, 'p7', 'Energy and Consumption',
-          'Every terajoule FedEx burns : jet fuel, vehicle fuel and electricity, FY2022 to FY2025',
+          'Every terajoule FedEx burns, from jet fuel to vehicle fuel and electricity, FY2022 to FY2025',
           filt='#D_FiscalYear.FiscalYearShort', flabel='FISCAL YEAR',
           fvfilter=('#D_FiscalYear.IsEnergy', 1, 0),
           fwidth=slicer_width('#D_FiscalYear.FiscalYearShort', ('#D_FiscalYear.IsEnergy', 1)))
@@ -556,7 +558,9 @@ def resources():
         brand.save(brand.kpi_icon(k, 96, (255, 255, 255)), f'ki_{k}.png')
         names.append(f'ki_{k}.png')
     # logo fourni par l'utilisateur
-    if os.path.exists(LOGO_SRC):
+    if not os.path.exists(LOGO_SRC):
+        raise SystemExit(f'missing brand asset: {LOGO_SRC}')
+    if True:
         brand.save(brand.fedex_logo(LOGO_SRC, 392, 112), 'fedex_logo.png')
         names.append('fedex_logo.png')
     return sorted(set(names))

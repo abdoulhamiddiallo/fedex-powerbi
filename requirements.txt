@@ -1,3 +1,4 @@
 # Build chain dependencies (Python 3.11+)
-pillow>=10.0          # every generated asset: map, icons, silhouettes, textures
-global-land-mask>=1.0 # land/sea mask used to plot the dot-matrix planisphere
+pillow>=10.0           # every generated asset: map, icons, silhouettes, textures
+global-land-mask>=1.0  # land/sea mask used to plot the dot-matrix planisphere
+numpy>=1.24            # required by global-land-mask, which does not declare it
