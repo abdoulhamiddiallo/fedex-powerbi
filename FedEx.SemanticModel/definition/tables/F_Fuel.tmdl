@@ -1,0 +1,49 @@
+table F_Fuel
+	lineageTag: 57cb08e5-5160-5e98-b177-450b17e0aab8
+
+	column FiscalYear
+		dataType: int64
+		formatString: 0
+		lineageTag: fdb73ecb-3880-5672-a522-5197ef1f2023
+		summarizeBy: none
+		sourceColumn: FiscalYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column JetFuelAvoidedMnGal
+		dataType: int64
+		formatString: #,0
+		lineageTag: 1c048515-5ced-5ba9-9acd-bca087ae1709
+		summarizeBy: none
+		sourceColumn: JetFuelAvoidedMnGal
+
+		annotation SummarizationSetBy = Automatic
+
+	column Scope
+		dataType: string
+		lineageTag: 6a428b06-5913-5b27-874f-c5c536ce2585
+		summarizeBy: none
+		sourceColumn: Scope
+
+		annotation SummarizationSetBy = Automatic
+
+	column Note
+		dataType: string
+		isHidden
+		lineageTag: 63a332bf-300c-5498-bb62-a723cbac3b9e
+		summarizeBy: none
+		sourceColumn: Note
+
+		annotation SummarizationSetBy = Automatic
+
+	partition F_Fuel = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DossierDonnees & "\F_Fuel.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Types = Table.TransformColumnTypes(Entetes, {{"FiscalYear", Int64.Type}, {"JetFuelAvoidedMnGal", Int64.Type}, {"Scope", type text}, {"Note", type text}}, "en-US")
+				in
+				    Types
+
+	annotation PBI_ResultType = Table

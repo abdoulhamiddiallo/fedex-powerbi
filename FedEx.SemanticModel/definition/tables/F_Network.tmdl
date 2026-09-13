@@ -1,0 +1,77 @@
+table F_Network
+	lineageTag: cd659d90-1c08-5aa4-8479-cbe08aab31b9
+
+	column Indicator
+		dataType: string
+		lineageTag: b7322e65-f48f-5d1b-8b2c-df55da00e234
+		summarizeBy: none
+		sourceColumn: Indicator
+		sortByColumn: SortOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column Value
+		dataType: int64
+		isHidden
+		formatString: #,0
+		lineageTag: 10a4d8ee-3d95-5f8a-8816-d3d080aeefaa
+		summarizeBy: none
+		sourceColumn: Value
+
+		annotation SummarizationSetBy = Automatic
+
+	column Unit
+		dataType: string
+		lineageTag: 8cef59aa-fb15-5cc6-9182-f49e8e4368e4
+		summarizeBy: none
+		sourceColumn: Unit
+
+		annotation SummarizationSetBy = Automatic
+
+	column Pillar
+		dataType: string
+		lineageTag: b54ae3ba-cc1b-5de7-9f3c-f33d978e67ff
+		summarizeBy: none
+		sourceColumn: Pillar
+
+		annotation SummarizationSetBy = Automatic
+
+	column SortOrder
+		dataType: int64
+		isHidden
+		formatString: #,0
+		lineageTag: b716ef87-9aa1-59f5-adb5-75498b4d6694
+		summarizeBy: none
+		sourceColumn: SortOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column Basis
+		dataType: string
+		lineageTag: 75fa9fc5-9a98-5472-93a8-5caed68d23ff
+		summarizeBy: none
+		sourceColumn: Basis
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsKey
+		dataType: int64
+		isHidden
+		formatString: #,0
+		lineageTag: 8cc0371f-5160-5f7a-afb5-27885fd39945
+		summarizeBy: none
+		sourceColumn: IsKey
+
+		annotation SummarizationSetBy = Automatic
+
+	partition F_Network = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DossierDonnees & "\F_Network.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Types = Table.TransformColumnTypes(Entetes, {{"Indicator", type text}, {"Value", Int64.Type}, {"Unit", type text}, {"Pillar", type text}, {"SortOrder", Int64.Type}, {"Basis", type text}, {"IsKey", Int64.Type}}, "en-US")
+				in
+				    Types
+
+	annotation PBI_ResultType = Table

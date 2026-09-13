@@ -1,0 +1,10 @@
+Target,TargetYear,Detail,Pillar,SortOrder
+Carbon-neutral operations,2040,The whole company,Enterprise,1
+Electric vehicle purchases,2030,All parcel PUD vehicle purchases,Ground,2
+Zero-emission parcel fleet,2040,The whole parcel PUD fleet,Ground,3
+Alternative aviation fuel,2030,"30% of jet fuel, blended",Air,4
+Aircraft emissions intensity,2034,-40% versus 2005,Air,5
+Trijet retirement,2032,MD-11 fleet fully retired,Air,6
+Renewable electricity,2028,500 GWh sourced,Facilities,7
+Renewable electricity,2033,"1,300 GWh sourced",Facilities,8
+Renewable electricity,2040,All facility electricity,Facilities,9

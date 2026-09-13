@@ -1,0 +1,163 @@
+table D_Hub
+	lineageTag: 8e319b6a-b683-5d57-bd38-06859fb5924b
+
+	column HubKey
+		dataType: string
+		isHidden
+		lineageTag: 9252ed8f-c291-5760-a3f0-b0e5fcadd5f9
+		summarizeBy: none
+		sourceColumn: HubKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Hub
+		dataType: string
+		lineageTag: 77ef56c2-a5ea-5c61-bb4f-576e5db6cb8b
+		summarizeBy: none
+		sourceColumn: Hub
+		sortByColumn: SortOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: 3fe90660-cf43-5302-b4a9-6173c5b8893e
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: 87c4afcd-ce97-58dc-8d64-4323ec1b6258
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country
+		dataType: string
+		lineageTag: e5c72544-f566-5d88-ab5e-1b166a6232a4
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	column Continent
+		dataType: string
+		lineageTag: 10d0cc8c-a747-5aae-b92f-6d94ca7336b0
+		summarizeBy: none
+		sourceColumn: Continent
+
+		annotation SummarizationSetBy = Automatic
+
+	column Tier
+		dataType: string
+		lineageTag: e7195557-aad6-5698-83a5-9761d9e76b4f
+		summarizeBy: none
+		sourceColumn: HubClass
+
+		annotation SummarizationSetBy = Automatic
+
+	column Acres
+		dataType: int64
+		formatString: #,0
+		lineageTag: ce064b0e-a0e7-5f1d-af91-afedee27d437
+		summarizeBy: none
+		sourceColumn: Acres
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Floor area'
+		dataType: int64
+		formatString: #,0
+		lineageTag: 5527430f-b608-5ce9-9d98-f92c703aef08
+		summarizeBy: none
+		sourceColumn: SquareFeet
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sort capacity /h'
+		dataType: int64
+		formatString: #,0
+		lineageTag: f866b811-8bdb-538e-9cfb-8492fd9d0b37
+		summarizeBy: none
+		sourceColumn: SortCapacityHr
+
+		annotation SummarizationSetBy = Automatic
+
+	column Lessor
+		dataType: string
+		lineageTag: 540a781b-ea17-51c6-9ada-69e8fdbb44f2
+		summarizeBy: none
+		sourceColumn: Lessor
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lease to'
+		dataType: int64
+		formatString: 0
+		lineageTag: 6a573f31-9e4b-55a8-858b-e4d40422ff45
+		summarizeBy: none
+		sourceColumn: LeaseExpiry
+
+		annotation SummarizationSetBy = Automatic
+
+	column Latitude
+		dataType: double
+		formatString: 0.0000
+		lineageTag: 557eeaa2-6817-51e8-9047-65ceaa7f3723
+		summarizeBy: none
+		sourceColumn: Latitude
+
+		annotation SummarizationSetBy = Automatic
+
+	column Longitude
+		dataType: double
+		formatString: 0.0000
+		lineageTag: b3936d8a-f234-5f44-836d-aa23a0291578
+		summarizeBy: none
+		sourceColumn: Longitude
+
+		annotation SummarizationSetBy = Automatic
+
+	column SortOrder
+		dataType: int64
+		isHidden
+		formatString: #,0
+		lineageTag: 68b8fb11-1fab-5bcc-b04c-0681572daa25
+		summarizeBy: none
+		sourceColumn: SortOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column PiecesPerSqFt
+		dataType: double
+		formatString: 0.00
+		lineageTag: 66c2b674-be9b-5739-b6c4-98707e78685d
+		summarizeBy: none
+		sourceColumn: PiecesPerSqFt
+
+		annotation SummarizationSetBy = Automatic
+
+	column CapacityRank
+		dataType: int64
+		isHidden
+		formatString: #,0
+		lineageTag: 70e5c3c3-6479-5b50-b06f-84cccd2f6058
+		summarizeBy: none
+		sourceColumn: CapacityRank
+
+		annotation SummarizationSetBy = Automatic
+
+	partition D_Hub = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DossierDonnees & "\D_Hub.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Types = Table.TransformColumnTypes(Entetes, {{"HubKey", type text}, {"Hub", type text}, {"City", type text}, {"Region", type text}, {"Country", type text}, {"Continent", type text}, {"HubClass", type text}, {"Acres", Int64.Type}, {"SquareFeet", Int64.Type}, {"SortCapacityHr", Int64.Type}, {"Lessor", type text}, {"LeaseExpiry", Int64.Type}, {"Latitude", type number}, {"Longitude", type number}, {"SortOrder", Int64.Type}, {"PiecesPerSqFt", type number}, {"CapacityRank", Int64.Type}}, "en-US")
+				in
+				    Types
+
+	annotation PBI_ResultType = Table

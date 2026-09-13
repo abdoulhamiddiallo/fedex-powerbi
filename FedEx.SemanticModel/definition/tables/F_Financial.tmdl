@@ -1,0 +1,104 @@
+table F_Financial
+	lineageTag: 1067dec2-35f9-55b5-8961-67c97b370426
+
+	column FiscalYear
+		dataType: int64
+		formatString: 0
+		lineageTag: 8d1b55a1-52ff-505c-ad74-fddae8a99500
+		summarizeBy: none
+		sourceColumn: FiscalYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column FiscalYearLabel
+		dataType: string
+		isHidden
+		lineageTag: 3f61a45a-b920-5373-abaa-f5cbe83c83eb
+		summarizeBy: none
+		sourceColumn: FiscalYearLabel
+
+		annotation SummarizationSetBy = Automatic
+
+	column Revenue
+		dataType: int64
+		formatString: #,0
+		lineageTag: 6e4068cb-ff0e-5da3-9f6e-94140a457787
+		summarizeBy: none
+		sourceColumn: Revenue
+
+		annotation SummarizationSetBy = Automatic
+
+	column OperatingIncome
+		dataType: int64
+		formatString: #,0
+		lineageTag: 41865b3a-3c6f-5d65-8859-6e446f68a6de
+		summarizeBy: none
+		sourceColumn: OperatingIncome
+
+		annotation SummarizationSetBy = Automatic
+
+	column NetIncome
+		dataType: int64
+		formatString: #,0
+		lineageTag: 6ba2b27e-bc11-567c-8d62-12f8262aba04
+		summarizeBy: none
+		sourceColumn: NetIncome
+
+		annotation SummarizationSetBy = Automatic
+
+	column EPSDiluted
+		dataType: double
+		formatString: #,0.00
+		lineageTag: c067459e-da29-5ea7-8574-556e5b13f420
+		summarizeBy: none
+		sourceColumn: EPSDiluted
+
+		annotation SummarizationSetBy = Automatic
+
+	column Capex
+		dataType: int64
+		formatString: #,0
+		lineageTag: adfc2e48-bd4b-58e4-ae4e-7e2ded73caca
+		summarizeBy: none
+		sourceColumn: Capex
+
+		annotation SummarizationSetBy = Automatic
+
+	column OperatingMarginPct
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 7379925c-95a5-5084-a914-e2f1707222d3
+		summarizeBy: none
+		sourceColumn: OperatingMarginPct
+
+		annotation SummarizationSetBy = Automatic
+
+	column NetMarginPct
+		dataType: double
+		formatString: #,0.00
+		lineageTag: b62b4af7-512f-5c26-970e-05758bba8c15
+		summarizeBy: none
+		sourceColumn: NetMarginPct
+
+		annotation SummarizationSetBy = Automatic
+
+	column CapexIntensityPct
+		dataType: double
+		formatString: #,0.00
+		lineageTag: a74dc123-d426-5f78-bbed-3143e9f29a2b
+		summarizeBy: none
+		sourceColumn: CapexIntensityPct
+
+		annotation SummarizationSetBy = Automatic
+
+	partition F_Financial = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DossierDonnees & "\F_Financial.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Types = Table.TransformColumnTypes(Entetes, {{"FiscalYear", Int64.Type}, {"FiscalYearLabel", type text}, {"Revenue", Int64.Type}, {"OperatingIncome", Int64.Type}, {"NetIncome", Int64.Type}, {"EPSDiluted", type number}, {"Capex", Int64.Type}, {"OperatingMarginPct", type number}, {"NetMarginPct", type number}, {"CapexIntensityPct", type number}}, "en-US")
+				in
+				    Types
+
+	annotation PBI_ResultType = Table

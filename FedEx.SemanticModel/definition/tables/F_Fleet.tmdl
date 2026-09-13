@@ -1,0 +1,50 @@
+table F_Fleet
+	lineageTag: 6d85504c-5a5c-5d30-82af-3d14b7de83c6
+
+	column FiscalYear
+		dataType: int64
+		formatString: 0
+		lineageTag: baa1edb0-55e7-5c99-92db-746a71d03d8c
+		summarizeBy: none
+		sourceColumn: FiscalYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column AircraftKey
+		dataType: string
+		isHidden
+		lineageTag: 0352685b-744d-5a06-b53b-fde2d2183f2f
+		summarizeBy: none
+		sourceColumn: AircraftKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Aircraft
+		dataType: int64
+		formatString: #,0
+		lineageTag: e4bd86de-5dc8-5cce-9f5d-3730eb107832
+		summarizeBy: none
+		sourceColumn: Aircraft
+
+		annotation SummarizationSetBy = Automatic
+
+	column PayloadLbs
+		dataType: int64
+		formatString: #,0
+		lineageTag: 1d56e733-a081-557c-a27d-da06c27d095c
+		summarizeBy: none
+		sourceColumn: PayloadLbs
+
+		annotation SummarizationSetBy = Automatic
+
+	partition F_Fleet = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DossierDonnees & "\F_Fleet.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Types = Table.TransformColumnTypes(Entetes, {{"FiscalYear", Int64.Type}, {"AircraftKey", type text}, {"Aircraft", Int64.Type}, {"PayloadLbs", Int64.Type}}, "en-US")
+				in
+				    Types
+
+	annotation PBI_ResultType = Table

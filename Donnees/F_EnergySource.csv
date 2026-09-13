@@ -1,0 +1,25 @@
+FiscalYear,Source,Energy,SortOrder,Pillar
+2022,Jet fuel,199401,1,Air
+2022,Diesel,39947,2,Ground
+2022,Electricity,8839,3,Facilities
+2022,Petrol,4888,4,Ground
+2022,LPG,1088,5,Ground
+2022,Natural gas,121,6,Facilities
+2023,Jet fuel,184725,1,Air
+2023,Diesel,36698,2,Ground
+2023,Electricity,8842,3,Facilities
+2023,Petrol,3848,4,Ground
+2023,LPG,971,5,Ground
+2023,Natural gas,80,6,Facilities
+2024,Jet fuel,173540,1,Air
+2024,Diesel,33600,2,Ground
+2024,Electricity,8983,3,Facilities
+2024,Petrol,3318,4,Ground
+2024,LPG,725,5,Ground
+2024,Natural gas,13,6,Facilities
+2025,Jet fuel,160209,1,Air
+2025,Diesel,32654,2,Ground
+2025,Electricity,9888,3,Facilities
+2025,Petrol,2937,4,Ground
+2025,LPG,702,5,Ground
+2025,Natural gas,57,6,Facilities

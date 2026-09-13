@@ -1,0 +1,56 @@
+relationship 7518d9e5-93c0-55cc-acf6-1a67b2ee6285
+	fromColumn: F_Fleet.AircraftKey
+	toColumn: D_Aircraft.AircraftKey
+
+relationship 55cfdca2-d466-5e54-9712-251030e8e584
+	fromColumn: F_FleetPlan.AircraftKey
+	toColumn: D_Aircraft.AircraftKey
+
+relationship e13c0200-1fc3-5277-9e7b-ec189c22f548
+	fromColumn: F_Fleet.FiscalYear
+	toColumn: D_FiscalYear.FiscalYear
+
+relationship 14fd7cef-b6f1-5fb6-bf08-1bddb3314ba7
+	fromColumn: F_Financial.FiscalYear
+	toColumn: D_FiscalYear.FiscalYear
+
+relationship a1c717d9-294a-58c7-8f8e-d744a08a2645
+	fromColumn: F_Segment.FiscalYear
+	toColumn: D_FiscalYear.FiscalYear
+
+relationship 845dbd56-7e20-5489-8201-4ebf78a1e4a1
+	fromColumn: F_Geography.FiscalYear
+	toColumn: D_FiscalYear.FiscalYear
+
+relationship 3116cce8-b125-5bd6-b638-0961819c547d
+	fromColumn: F_Freight.FiscalYear
+	toColumn: D_FiscalYear.FiscalYear
+
+relationship 346c2cf9-9d4a-5e48-8b5b-0665508b95ce
+	fromColumn: F_Climate.FiscalYear
+	toColumn: D_FiscalYear.FiscalYear
+
+relationship be8f50a1-4ef1-508b-a921-747e76850c91
+	fromColumn: F_Electric.FiscalYear
+	toColumn: D_FiscalYear.FiscalYear
+
+relationship edf09192-e66f-5798-824f-774c1cb31dd3
+	fromColumn: F_Fuel.FiscalYear
+	toColumn: D_FiscalYear.FiscalYear
+
+relationship e7c6c4ab-6a37-57d5-a30e-32daebff13bc
+	fromColumn: F_SAF.FiscalYear
+	toColumn: D_FiscalYear.FiscalYear
+
+relationship 2e33b5fb-87d6-5fd0-ac85-e13ffc5b4b15
+	fromColumn: F_People.FiscalYear
+	toColumn: D_FiscalYear.FiscalYear
+
+relationship cec05cb6-8fd5-5ddd-82b7-9232c5193ca2
+	fromColumn: F_Energy.FiscalYear
+	toColumn: D_FiscalYear.FiscalYear
+
+relationship 85381754-9a87-5cf5-aff8-b28222c94164
+	fromColumn: F_EnergySource.FiscalYear
+	toColumn: D_FiscalYear.FiscalYear
+

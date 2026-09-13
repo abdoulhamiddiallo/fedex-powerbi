@@ -1,0 +1,6 @@
+/// Absolute path of the folder holding the CSV files that feed the model.
+/// Set this to your own Donnees folder after cloning: Transform data > Manage parameters.
+expression DossierDonnees = "C:\FedEx\Donnees" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 3577b426-2443-57e4-b339-7faf00a9c23d
+
+	annotation PBI_ResultType = Text

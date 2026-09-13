@@ -1,0 +1,41 @@
+table F_Electric
+	lineageTag: 82d3afb7-6da0-5847-b9a9-5ba455264c41
+
+	column FiscalYear
+		dataType: int64
+		formatString: 0
+		lineageTag: fed7e8be-49e6-5b02-806a-fad19751988c
+		summarizeBy: none
+		sourceColumn: FiscalYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column ElectricVehicles
+		dataType: int64
+		formatString: #,0
+		lineageTag: 0d9b18ab-71c7-53eb-bad6-fee24b872869
+		summarizeBy: none
+		sourceColumn: ElectricVehicles
+
+		annotation SummarizationSetBy = Automatic
+
+	column GrowthPct
+		dataType: double
+		formatString: #,0.0
+		lineageTag: 92c9295e-6ab6-5650-a2c4-851fa79d67f8
+		summarizeBy: none
+		sourceColumn: GrowthPct
+
+		annotation SummarizationSetBy = Automatic
+
+	partition F_Electric = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DossierDonnees & "\F_Electric.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Types = Table.TransformColumnTypes(Entetes, {{"FiscalYear", Int64.Type}, {"ElectricVehicles", Int64.Type}, {"GrowthPct", type number}}, "en-US")
+				in
+				    Types
+
+	annotation PBI_ResultType = Table

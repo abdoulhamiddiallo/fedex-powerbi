@@ -1,0 +1,20 @@
+Indicator,Value,Unit,Pillar,SortOrder,Basis,IsKey
+Countries & territories served,220,countries,Reach,1,over 220,1
+Share of global GDP connected,99,%,Reach,2,more than 99%,0
+Airports served,650,airports,Air,3,more than 650,1
+Aircraft in fleet,700,aircraft,Air,4,10-K FY2026,0
+Major sorting hubs,15,hubs,Air,5,10-K FY2026 property table,0
+Motorized vehicles operated,82000,vehicles,Ground,6,"Federal Express, approximately",1
+Service provider vehicles,100000,vehicles,Ground,7,owned or leased by independent service providers,0
+Vehicles in the global network,180000,vehicles,Ground,8,"over 180,000",1
+U.S. operating facilities,1085,facilities,Facilities,9,approximately,1
+Canadian sorting & distribution centres,96,facilities,Facilities,10,as reported,0
+International city stations,1000,stations,Facilities,11,"over 1,000",1
+FedEx Office stores,2000,stores,Retail,12,approximately,1
+Commercial print plants,16,plants,Retail,13,as reported,0
+Drop boxes,23000,drop boxes,Retail,14,approximately,1
+"Staffed drop-off points, U.S.",25000,locations,Retail,15,approximately,1
+"Staffed drop-off points, international",37000,locations,Retail,16,approximately,1
+Permanent employees,530000,people,People,17,"300,000 full-time + 230,000 part-time",1
+Federal Express segment employees,452000,people,People,18,"233,000 full-time + 219,000 part-time",0
+Independent service providers,5300,companies,People,19,approximately,0

@@ -1,0 +1,905 @@
+table Metrics
+	lineageTag: 83a058fb-34b0-50ea-93a5-8682f2218f52
+
+	/// Aircraft in the fleet at the close of the fiscal year in context.
+	measure Aircraft = VAR y = MAX ( F_Fleet[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Fleet[Aircraft] ), F_Fleet[FiscalYear] = y )
+		formatString: #,0
+		displayFolder: 01 Fleet
+		lineageTag: 52852590-4eb1-5002-bd96-ce11ab3b0d96
+
+	measure 'Aircraft LY' = CALCULATE ( [Aircraft], D_FiscalYear[FiscalYear] = MAX ( F_Fleet[FiscalYear] ) - 1 )
+		formatString: #,0
+		displayFolder: 01 Fleet
+		lineageTag: a49bc045-d79d-5672-a988-da859e4d08ca
+
+	measure 'Aircraft change' = [Aircraft] - [Aircraft LY]
+		formatString: +#,0;-#,0;0
+		displayFolder: 01 Fleet
+		lineageTag: 9518ab27-db75-5380-b7b8-4f9ca337def6
+
+	measure 'Fleet total' = CALCULATE ( [Aircraft], REMOVEFILTERS ( D_Aircraft ) )
+		formatString: #,0
+		displayFolder: 01 Fleet
+		lineageTag: fc6112c9-b068-5463-9169-17112259e444
+
+	measure 'Aircraft owned' = SUM ( D_Aircraft[Owned] )
+		formatString: #,0
+		displayFolder: 01 Fleet
+		lineageTag: 86d4483c-f6a3-5242-a498-a4095fd5f396
+
+	measure 'Aircraft leased' = SUM ( D_Aircraft[Leased] )
+		formatString: #,0
+		displayFolder: 01 Fleet
+		lineageTag: 951148e3-b4db-592d-919f-f01cc92ef842
+
+	measure 'Aircraft on order' = SUM ( D_Aircraft[OnOrder] )
+		formatString: #,0
+		displayFolder: 01 Fleet
+		lineageTag: 33ad7fe9-bb78-5dbe-8660-22472d9c6e12
+
+	/// Delivered aircraft undergoing pre-service modification at 31 May 2026.
+	measure 'Aircraft in modification' = SUM ( D_Aircraft[NotInService] )
+		formatString: #,0
+		displayFolder: 01 Fleet
+		lineageTag: 43d8efeb-4088-5fa5-a34d-e1e2425dd457
+
+	measure 'Owned share' = DIVIDE ( [Aircraft owned], [Aircraft owned] + [Aircraft leased] )
+		formatString: 0.0%
+		displayFolder: 03 Fleet mix
+		lineageTag: 34e787a8-8163-5c18-aa84-5cfa9ab85182
+
+	measure 'Leased share' = DIVIDE ( [Aircraft leased], [Aircraft owned] + [Aircraft leased] )
+		formatString: 0.0%
+		displayFolder: 03 Fleet mix
+		lineageTag: 09d53b06-2840-5812-a56f-9f6dadd6f974
+
+	measure 'Trunk aircraft' = CALCULATE ( [Aircraft], D_Aircraft[Class] = "Trunk" )
+		formatString: #,0
+		displayFolder: 03 Fleet mix
+		lineageTag: 358d7380-3599-53d6-ab81-b8bb03a3cbd5
+
+	measure 'Feeder aircraft' = CALCULATE ( [Aircraft], D_Aircraft[Class] = "Feeder" )
+		formatString: #,0
+		displayFolder: 03 Fleet mix
+		lineageTag: 0667b5ae-8244-5a0f-acd0-48408a5c1dc2
+
+	measure 'Trunk share' = DIVIDE ( [Trunk aircraft], [Fleet total] )
+		formatString: 0.0%
+		displayFolder: 03 Fleet mix
+		lineageTag: f5a6e64c-2e80-5572-9d15-14ce5cfadb08
+
+	measure 'Boeing aircraft' = CALCULATE ( [Aircraft], D_Aircraft[IsBoeing] = 1 )
+		formatString: #,0
+		displayFolder: 03 Fleet mix
+		lineageTag: b919cf35-c7e5-58d6-9ea0-48ddabb85ba1
+
+	/// Share of the total fleet built by Boeing, including the MD-11 trijet.
+	measure 'Boeing share' = DIVIDE ( CALCULATE ( [Aircraft], D_Aircraft[IsBoeing] = 1, REMOVEFILTERS ( D_Aircraft ) ), [Fleet total] )
+		formatString: 0.0%
+		displayFolder: 03 Fleet mix
+		lineageTag: 2594985a-4e1f-5570-92ea-a6846e1b957c
+
+	measure 'Manufacturer share' = DIVIDE ( [Aircraft], [Fleet total] )
+		formatString: 0.0%
+		displayFolder: 03 Fleet mix
+		lineageTag: 958c984e-1129-5d7a-b9ae-8dac8a92ff5a
+
+	/// Sum of maximum gross structural payload across every aircraft in the fleet.
+	measure 'Fleet payload lbs' = VAR y = MAX ( F_Fleet[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Fleet[PayloadLbs] ), F_Fleet[FiscalYear] = y )
+		formatString: #,0
+		displayFolder: 02 Payload & capacity
+		lineageTag: 47f8bbab-f6a2-50d4-807e-89f494e2c383
+
+	measure 'Fleet payload Mlbs' = DIVIDE ( [Fleet payload lbs], 1000000 )
+		formatString: #,0.0
+		displayFolder: 02 Payload & capacity
+		lineageTag: cc169190-194d-556e-af24-47c01ed495d3
+
+	measure 'Fleet payload tonnes' = DIVIDE ( [Fleet payload lbs], 2204.62 )
+		formatString: #,0
+		displayFolder: 02 Payload & capacity
+		lineageTag: d8a88c7f-1cca-53b7-ae0b-93a7c0c83df0
+
+	measure 'Payload total' = CALCULATE ( [Fleet payload lbs], REMOVEFILTERS ( D_Aircraft ) )
+		formatString: #,0
+		displayFolder: 02 Payload & capacity
+		lineageTag: 913f3079-a501-52ea-882f-14d6cb967caf
+
+	/// Average maximum payload per aircraft, in pounds.
+	measure 'Average payload' = DIVIDE ( [Fleet payload lbs], [Aircraft] )
+		formatString: #,0
+		displayFolder: 02 Payload & capacity
+		lineageTag: 4b138b95-c538-5d7f-bca1-99bc5bfeca81
+
+	measure 'Type payload' = SUM ( D_Aircraft[Payload] )
+		formatString: #,0
+		displayFolder: 02 Payload & capacity
+		lineageTag: 76cadb66-39b9-5813-8b8a-d82f04fe458a
+
+	measure 'Payload share' = DIVIDE ( [Fleet payload lbs], [Payload total] )
+		formatString: 0.0%
+		displayFolder: 02 Payload & capacity
+		lineageTag: 4f9a80b0-e3f8-5398-944a-4280b69d6d19
+
+	measure 'Boeing payload share' = DIVIDE ( CALCULATE ( [Fleet payload lbs], D_Aircraft[IsBoeing] = 1, REMOVEFILTERS ( D_Aircraft ) ), [Payload total] )
+		formatString: 0.0%
+		displayFolder: 02 Payload & capacity
+		lineageTag: 57112482-e457-51b9-9961-59851bf83b6f
+
+	measure 'Trunk payload share' = DIVIDE ( CALCULATE ( [Fleet payload lbs], D_Aircraft[Class] = "Trunk", REMOVEFILTERS ( D_Aircraft ) ), [Payload total] )
+		formatString: 0.0%
+		displayFolder: 02 Payload & capacity
+		lineageTag: aae6a5ad-419b-5fbb-8d1e-03897034aeb0
+
+	measure 'Payload per aircraft type' = AVERAGE ( D_Aircraft[Payload] )
+		formatString: #,0
+		displayFolder: 02 Payload & capacity
+		lineageTag: 4e08fdf6-01cc-5672-96d1-4dac8cb4da05
+
+	measure Deliveries = SUM ( F_FleetPlan[Deliveries] )
+		formatString: #,0
+		displayFolder: 01 Fleet
+		lineageTag: 4b62d05b-f1ba-54a7-9f1d-0bfd8e496494
+
+	measure Retirements = SUM ( F_FleetPlan[Retirements] )
+		formatString: #,0
+		displayFolder: 01 Fleet
+		lineageTag: 09865b56-1af6-5192-a119-8d8f8b8520bb
+
+	measure 'Net fleet change' = SUM ( F_FleetPlan[NetChange] )
+		formatString: +#,0;-#,0;0
+		displayFolder: 01 Fleet
+		lineageTag: 93cad08f-c8ec-5a74-80f7-1fd481434a53
+
+	measure Hubs = COUNTROWS ( D_Hub )
+		formatString: #,0
+		displayFolder: 04 Hubs & network
+		lineageTag: cff1c607-fe2c-5c90-a005-0d472977757e
+
+	/// Combined hourly sorting capacity of the major sorting facilities, in pieces per hour.
+	measure 'Sort capacity' = SUM ( D_Hub[Sort capacity /h] )
+		formatString: #,0
+		displayFolder: 04 Hubs & network
+		lineageTag: a9db7f33-f581-5c17-b1ec-9f919d935cc4
+
+	measure 'Sort capacity k' = DIVIDE ( [Sort capacity], 1000 )
+		formatString: #,0
+		displayFolder: 04 Hubs & network
+		lineageTag: 7744116a-b35e-520a-b07b-b7fb9b4341e2
+
+	measure 'Sq ft' = SUM ( D_Hub[Floor area] )
+		formatString: #,0
+		displayFolder: 04 Hubs & network
+		lineageTag: 235c8782-7ab7-51b2-91bd-0b9894288600
+
+	measure 'Footprint Msqft' = DIVIDE ( [Sq ft], 1000000 )
+		formatString: #,0.0
+		displayFolder: 04 Hubs & network
+		lineageTag: 3d354690-8eb2-5407-bbfa-b0850bf4c92f
+
+	measure 'Hub acres' = SUM ( D_Hub[Acres] )
+		formatString: #,0
+		displayFolder: 04 Hubs & network
+		lineageTag: ccacc4b5-d755-5ae0-85cb-bc1981d466e7
+
+	measure Share = DIVIDE ( [Sort capacity], CALCULATE ( [Sort capacity], REMOVEFILTERS ( D_Hub ) ) )
+		formatString: 0.0%
+		displayFolder: 04 Hubs & network
+		lineageTag: 71b67d94-fe5c-5aa9-b7fe-c40d3b34e33a
+
+	measure 'Years to lease expiry' = MIN ( D_Hub[Lease to] ) - 2026
+		formatString: #,0
+		displayFolder: 04 Hubs & network
+		lineageTag: 9983c32d-5c92-51d7-adb4-a6595a68f7bd
+
+	/// Scope 3 emissions in thousands of metric tons, for readable chart labels.
+	measure 'Scope 3 kt' = DIVIDE ( [Scope 3], 1000 )
+		formatString: #,0
+		displayFolder: 07 Climate
+		lineageTag: c78ebb72-4a34-5be3-925a-b4e6feb472d7
+
+	measure 'Fleet change abs' = ABS ( [vs FY23] )
+		formatString: #,0
+		displayFolder: 01 Fleet
+		lineageTag: 769ecd26-0b49-51ea-98da-0b2a2ec45ea4
+
+	measure 'Payload Mlb by type' = DIVIDE ( [Fleet payload lbs], 1000000 )
+		formatString: #,0.0
+		displayFolder: 02 Payload & capacity
+		lineageTag: dd30c138-7b7c-5f3b-af0c-28ad53047dce
+
+	measure 'Sq ft k' = DIVIDE ( [Sq ft], 1000 )
+		formatString: #,0
+		displayFolder: 04 Hubs & network
+		lineageTag: d2847834-07fc-5ef0-b1d0-3f3ee87d9232
+
+	measure 'Total lift' = [Fleet payload lbs]
+		formatString: #,0
+		displayFolder: 02 Payload & capacity
+		lineageTag: f5aca45c-001b-580d-bf11-1638a33b788d
+
+	measure 'Area rank' = RANKX ( ALL ( D_Hub[Hub] ), [Sq ft],, DESC )
+		formatString: 0
+		displayFolder: 04 Hubs & network
+		lineageTag: 101a2d83-e5fb-57e2-bdcb-743e9ca75f55
+
+	/// Change in the number of aircraft of each type between FY2023 and FY2026.
+	measure 'vs FY23' = VAR b = CALCULATE ( [Aircraft], REMOVEFILTERS ( D_FiscalYear ), F_Fleet[FiscalYear] = 2023 ) VAR n = CALCULATE ( [Aircraft], REMOVEFILTERS ( D_FiscalYear ), F_Fleet[FiscalYear] = 2026 ) RETURN n - b
+		formatString: +#,0;-#,0;0
+		displayFolder: 01 Fleet
+		lineageTag: 5afef4d9-0ef5-5f61-a0ce-f9bdb836f769
+
+	measure 'Hub rank' = RANKX ( ALL ( D_Hub[Hub] ), [Sort capacity],, DESC )
+		formatString: 0
+		displayFolder: 04 Hubs & network
+		lineageTag: b07cd57c-cfd6-5ef6-a77e-1fb75a6c4ebb
+
+	measure 'Countries served' = CALCULATE ( SUM ( F_Network[Value] ), F_Network[Indicator] = "Countries & territories served" )
+		formatString: #,0
+		displayFolder: 04 Hubs & network
+		lineageTag: 101b0ded-4bba-56f1-9e62-0d11a2f90ab4
+
+	measure 'Airports served' = CALCULATE ( SUM ( F_Network[Value] ), F_Network[Indicator] = "Airports served" )
+		formatString: #,0
+		displayFolder: 04 Hubs & network
+		lineageTag: 0bdd1465-7259-542c-8281-5417dcfd5e18
+
+	measure Vehicles = CALCULATE ( SUM ( F_Network[Value] ), F_Network[Indicator] = "Vehicles in the global network" )
+		formatString: #,0
+		displayFolder: 04 Hubs & network
+		lineageTag: 5077a589-f705-5b30-af63-02bd72dffb9c
+
+	measure 'Own vehicles' = CALCULATE ( SUM ( F_Network[Value] ), F_Network[Indicator] = "Motorized vehicles operated" )
+		formatString: #,0
+		displayFolder: 04 Hubs & network
+		lineageTag: 7cb18889-91b0-5a63-a231-190309b80f02
+
+	measure 'Provider vehicles' = CALCULATE ( SUM ( F_Network[Value] ), F_Network[Indicator] = "Service provider vehicles" )
+		formatString: #,0
+		displayFolder: 04 Hubs & network
+		lineageTag: 01fcaac6-1a15-5f95-beb0-2994ed0dbb4e
+
+	measure 'US facilities' = CALCULATE ( SUM ( F_Network[Value] ), F_Network[Indicator] = "U.S. operating facilities" )
+		formatString: #,0
+		displayFolder: 04 Hubs & network
+		lineageTag: d6780a2c-40d2-5ce9-be97-8f9a591d917c
+
+	measure 'Drop boxes' = CALCULATE ( SUM ( F_Network[Value] ), F_Network[Indicator] = "Drop boxes" )
+		formatString: #,0
+		displayFolder: 04 Hubs & network
+		lineageTag: cad77b68-6601-5d22-b1fb-4e338605fc3c
+
+	measure 'Retail points US' = CALCULATE ( SUM ( F_Network[Value] ), F_Network[Indicator] = "Staffed drop-off points, U.S." )
+		formatString: #,0
+		displayFolder: 04 Hubs & network
+		lineageTag: 4dc979fb-221d-5a9c-97a9-660ebf13b094
+
+	measure 'Retail points intl' = CALCULATE ( SUM ( F_Network[Value] ), F_Network[Indicator] = "Staffed drop-off points, international" )
+		formatString: #,0
+		displayFolder: 04 Hubs & network
+		lineageTag: 699a8b9e-6d8b-546a-97a3-96d535013740
+
+	measure 'Office stores' = CALCULATE ( SUM ( F_Network[Value] ), F_Network[Indicator] = "FedEx Office stores" )
+		formatString: #,0
+		displayFolder: 04 Hubs & network
+		lineageTag: f807c229-9506-5737-960c-aa8108eb93ba
+
+	measure 'City stations' = CALCULATE ( SUM ( F_Network[Value] ), F_Network[Indicator] = "International city stations" )
+		formatString: #,0
+		displayFolder: 04 Hubs & network
+		lineageTag: 036e0eec-1390-5b05-bf10-645226b36a13
+
+	measure 'Retail points' = [Retail points US] + [Retail points intl] + [Drop boxes]
+		formatString: #,0
+		displayFolder: 04 Hubs & network
+		lineageTag: bafa37cf-85a6-573b-a5ad-9029dae15bb4
+
+	measure 'Reported figure' = SUM ( F_Network[Value] )
+		formatString: #,0
+		displayFolder: 04 Hubs & network
+		lineageTag: f065a058-79bb-526c-bee5-f2fac2186799
+
+	measure Employees = CALCULATE ( SUM ( F_People[Total] ), F_People[FiscalYear] = MAX ( F_People[FiscalYear] ) )
+		formatString: #,0
+		displayFolder: 04 Hubs & network
+		lineageTag: fcdc7d62-0751-50c1-b891-15bab8dfdca1
+
+	measure 'Full-time employees' = CALCULATE ( SUM ( F_People[FullTime] ), F_People[FiscalYear] = MAX ( F_People[FiscalYear] ) )
+		formatString: #,0
+		displayFolder: 04 Hubs & network
+		lineageTag: 057e8357-b07a-5c08-aead-591ace17b0bf
+
+	measure 'Part-time employees' = CALCULATE ( SUM ( F_People[PartTime] ), F_People[FiscalYear] = MAX ( F_People[FiscalYear] ) )
+		formatString: #,0
+		displayFolder: 04 Hubs & network
+		lineageTag: 201106f2-5d5b-56ce-a459-ba748cbc879a
+
+	/// Consolidated revenue for the fiscal year in context, USD millions.
+	measure Revenue = VAR y = MAX ( F_Financial[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Financial[Revenue] ), F_Financial[FiscalYear] = y )
+		formatString: #,0
+		displayFolder: 05 Financial
+		lineageTag: 607f24f9-51f8-5bce-9ac7-4262976198a7
+
+	measure 'Revenue bn' = DIVIDE ( [Revenue], 1000 )
+		formatString: #,0.0
+		displayFolder: 05 Financial
+		lineageTag: 68ccf100-f726-5d7a-b0cf-0d373f4e2eec
+
+	measure 'Revenue LY' = CALCULATE ( [Revenue], D_FiscalYear[FiscalYear] = MAX ( F_Financial[FiscalYear] ) - 1 )
+		formatString: #,0
+		displayFolder: 05 Financial
+		lineageTag: 337ee6ae-aa1b-50d9-87e9-5bdde79fc7cc
+
+	measure 'Revenue growth' = DIVIDE ( [Revenue] - [Revenue LY], [Revenue LY] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 05 Financial
+		lineageTag: 9c10abc9-a0f9-5668-a237-30ad3b517858
+
+	measure 'Operating income' = VAR y = MAX ( F_Financial[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Financial[OperatingIncome] ), F_Financial[FiscalYear] = y )
+		formatString: #,0
+		displayFolder: 05 Financial
+		lineageTag: daf02405-4ced-536a-8a19-79d583b24d5a
+
+	measure 'Operating margin' = DIVIDE ( [Operating income], [Revenue] )
+		formatString: 0.0%
+		displayFolder: 05 Financial
+		lineageTag: 34ef322d-abd3-5c70-9f86-cba92f9143c5
+
+	measure 'Net income' = VAR y = MAX ( F_Financial[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Financial[NetIncome] ), F_Financial[FiscalYear] = y )
+		formatString: #,0
+		displayFolder: 05 Financial
+		lineageTag: 68768e52-94f0-5727-8937-fbd54325f60a
+
+	measure 'Net margin' = DIVIDE ( [Net income], [Revenue] )
+		formatString: 0.0%
+		displayFolder: 05 Financial
+		lineageTag: 160507d8-ff84-5274-b826-f035c3b15e55
+
+	measure EPS = VAR y = MAX ( F_Financial[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Financial[EPSDiluted] ), F_Financial[FiscalYear] = y )
+		formatString: $#,0.00
+		displayFolder: 05 Financial
+		lineageTag: 7186e4e1-8fbb-5a48-9f39-0890672a6eb5
+
+	measure Capex = VAR y = MAX ( F_Financial[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Financial[Capex] ), F_Financial[FiscalYear] = y )
+		formatString: #,0
+		displayFolder: 05 Financial
+		lineageTag: 19032c50-2e1f-560c-8864-c04b72384f7b
+
+	measure 'Capex intensity' = DIVIDE ( [Capex], [Revenue] )
+		formatString: 0.0%
+		displayFolder: 05 Financial
+		lineageTag: 70964ad7-8002-5b41-9edf-f2173462946b
+
+	measure 'Revenue, $m' = VAR y = MAX ( F_Segment[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Segment[Revenue] ), F_Segment[FiscalYear] = y )
+		formatString: #,0
+		displayFolder: 05 Financial
+		lineageTag: e6e562bd-14fd-5bdb-ad89-a4fcee86dbe9
+
+	measure 'Op income, $m' = VAR y = MAX ( F_Segment[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Segment[OperatingIncome] ), F_Segment[FiscalYear] = y )
+		formatString: #,0
+		displayFolder: 05 Financial
+		lineageTag: 59dd1ef3-d59c-5a6c-a266-8e3cfda813bb
+
+	measure Margin = DIVIDE ( [Op income, $m], [Revenue, $m] )
+		formatString: 0.0%
+		displayFolder: 05 Financial
+		lineageTag: e934256c-1e0a-57f5-92a1-b5771c9fe5ff
+
+	measure 'Segment share' = DIVIDE ( [Revenue, $m], CALCULATE ( [Revenue, $m], REMOVEFILTERS ( F_Segment[Segment] ) ) )
+		formatString: 0.0%
+		displayFolder: 05 Financial
+		lineageTag: ba7b271f-f5b7-5a92-972a-f6f7e986e686
+
+	measure 'Geography revenue' = VAR y = MAX ( F_Geography[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Geography[Revenue] ), F_Geography[FiscalYear] = y )
+		formatString: #,0
+		displayFolder: 05 Financial
+		lineageTag: bc9223ca-7eea-5c58-89c9-38f7e7c16bd7
+
+	measure 'Geography share' = DIVIDE ( [Geography revenue], CALCULATE ( [Geography revenue], REMOVEFILTERS ( F_Geography[Geography] ) ) )
+		formatString: 0.0%
+		displayFolder: 05 Financial
+		lineageTag: 6dd588a0-8ae9-55c9-a84c-ca6fa51f1705
+
+	measure 'Service revenue' = SUM ( F_Service[Revenue] )
+		formatString: #,0
+		displayFolder: 06 Volumes & yield
+		lineageTag: 5ffea458-e71a-566c-9aa6-49c0bc2d44e4
+
+	/// Average daily package volume, thousands of packages.
+	measure 'Daily packages' = SUM ( F_Service[Daily volume (k)] )
+		formatString: #,0
+		displayFolder: 06 Volumes & yield
+		lineageTag: 2f4bf7e3-61ad-5686-8931-4942485a5f23
+
+	measure 'Daily packages m' = DIVIDE ( [Daily packages], 1000 )
+		formatString: #,0.0
+		displayFolder: 06 Volumes & yield
+		lineageTag: 0b497d75-5dee-586a-a82b-a1b8ddffca42
+
+	measure 'Daily packages LY' = SUM ( F_Service[ADVPrior] )
+		formatString: #,0
+		displayFolder: 06 Volumes & yield
+		lineageTag: cf43fb11-6e21-5e8b-b989-bafddb104216
+
+	measure 'Volume growth' = DIVIDE ( [Daily packages] - [Daily packages LY], [Daily packages LY] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 06 Volumes & yield
+		lineageTag: 0c5bbc7d-78c0-5e2e-968d-f3ec07e57c35
+
+	/// Revenue per package, derived from annual revenue and 252 operating days.
+	measure Yield = DIVIDE ( [Service revenue] * 1000, [Daily packages] * 252 )
+		formatString: $#,0.00
+		displayFolder: 06 Volumes & yield
+		lineageTag: 666bbeb7-9a01-553e-b501-deba0c0aa76d
+
+	measure 'Reported yield' = AVERAGE ( F_Service[Yield ($)] )
+		formatString: $#,0.00
+		displayFolder: 06 Volumes & yield
+		lineageTag: 5ffb0674-00c7-5916-aaf4-fc98a3f73e47
+
+	measure 'LTL shipments' = CALCULATE ( SUM ( F_Freight[ShipmentsPerDay] ), F_Freight[FiscalYear] = MAX ( F_Freight[FiscalYear] ) )
+		formatString: #,0
+		displayFolder: 06 Volumes & yield
+		lineageTag: 25dfcebb-12dd-5353-a2c2-b1c6feda0f23
+
+	measure 'LTL revenue per shipment' = CALCULATE ( AVERAGE ( F_Freight[RevenuePerShipment] ), F_Freight[FiscalYear] = MAX ( F_Freight[FiscalYear] ) )
+		formatString: $#,0.00
+		displayFolder: 06 Volumes & yield
+		lineageTag: 8fc49dd1-5ac2-5ea7-8d98-aedf92b91c05
+
+	measure 'LTL shipments series' = SUM ( F_Freight[ShipmentsPerDay] )
+		formatString: #,0
+		displayFolder: 06 Volumes & yield
+		lineageTag: fe6d639e-e462-5eab-ab70-97f412a3a50c
+
+	measure 'LTL yield series' = AVERAGE ( F_Freight[RevenuePerShipment] )
+		formatString: $#,0.00
+		displayFolder: 06 Volumes & yield
+		lineageTag: 378c3177-7cf0-5d31-a3b6-3ef78f269643
+
+	/// Direct greenhouse gas emissions, metric tons CO2e.
+	measure 'Scope 1' = VAR y = MAX ( F_Climate[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Climate[Scope1] ), F_Climate[FiscalYear] = y )
+		formatString: #,0
+		displayFolder: 07 Climate
+		lineageTag: 480a501d-f25b-5935-b434-5357569c341d
+
+	measure 'Scope 2' = VAR y = MAX ( F_Climate[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Climate[Scope2] ), F_Climate[FiscalYear] = y )
+		formatString: #,0
+		displayFolder: 07 Climate
+		lineageTag: 2d78a424-008d-5a12-a355-fda74460189c
+
+	measure 'Scope 1 and 2' = VAR y = MAX ( F_Climate[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Climate[Scope1and2] ), F_Climate[FiscalYear] = y )
+		formatString: #,0
+		displayFolder: 07 Climate
+		lineageTag: 549b4ed8-b1de-5cb4-814d-18ea413145b6
+
+	measure 'Scope 1 and 2 Mt' = DIVIDE ( [Scope 1 and 2], 1000000 )
+		formatString: #,0.00
+		displayFolder: 07 Climate
+		lineageTag: 72b989f8-5917-5e0c-8a14-de7fd356e88a
+
+	measure 'Scope 1 and 2 base' = CALCULATE ( [Scope 1 and 2], REMOVEFILTERS ( D_FiscalYear ), F_Climate[FiscalYear] = 2019 )
+		formatString: #,0
+		displayFolder: 07 Climate
+		lineageTag: 4a5bd127-2a61-5fa3-bf12-78fe7ffe5ab6
+
+	measure 'Emissions vs FY2019' = DIVIDE ( [Scope 1 and 2] - [Scope 1 and 2 base], [Scope 1 and 2 base] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 07 Climate
+		lineageTag: 75787b20-f0e7-592e-9f20-0a6f8ea90a06
+
+	measure 'Scope 3' = SUM ( F_Scope3[Emissions] )
+		formatString: #,0
+		displayFolder: 07 Climate
+		lineageTag: 624498f4-0f55-59af-bb94-106dc38402ca
+
+	measure 'Scope 3 Mt' = DIVIDE ( [Scope 3], 1000000 )
+		formatString: #,0.00
+		displayFolder: 07 Climate
+		lineageTag: 1aaedd14-89b3-5f45-afb8-7a6bea5fddb1
+
+	measure 'Scope 3 share' = DIVIDE ( [Scope 3], CALCULATE ( [Scope 3], REMOVEFILTERS ( F_Scope3 ) ) )
+		formatString: 0.0%
+		displayFolder: 07 Climate
+		lineageTag: 53ac0046-534c-5242-a9e5-81cb16923e1d
+
+	/// Scope 1 and 2 emissions per million dollars of revenue.
+	measure 'Carbon intensity' = AVERAGE ( F_Intensity[IntensityPerRevenueMn] )
+		formatString: #,0.0
+		displayFolder: 07 Climate
+		lineageTag: 778c9917-1f46-5010-bb11-e7186ea13826
+
+	measure 'Carbon intensity latest' = CALCULATE ( [Carbon intensity], REMOVEFILTERS ( F_Intensity ), F_Intensity[FiscalYear] = 2025 )
+		formatString: #,0.0
+		displayFolder: 07 Climate
+		lineageTag: 04f9fc15-a697-5431-90b3-da241af09548
+
+	measure 'Carbon intensity 2009' = CALCULATE ( [Carbon intensity], REMOVEFILTERS ( F_Intensity ), F_Intensity[FiscalYear] = 2009 )
+		formatString: #,0.0
+		displayFolder: 07 Climate
+		lineageTag: 69409656-a11e-5169-bea5-f003eb70e501
+
+	measure 'Intensity reduction' = DIVIDE ( [Carbon intensity latest] - [Carbon intensity 2009], [Carbon intensity 2009] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 07 Climate
+		lineageTag: 8b5984e8-8de5-50bf-8f1c-8a3e23b41070
+
+	measure 'Electric vehicles' = CALCULATE ( SUM ( F_Electric[ElectricVehicles] ), F_Electric[FiscalYear] = MAX ( F_Electric[FiscalYear] ) )
+		formatString: #,0
+		displayFolder: 07 Climate
+		lineageTag: 0c523865-991d-5c43-9bb8-593a038b6958
+
+	measure 'Electric vehicles series' = SUM ( F_Electric[ElectricVehicles] )
+		formatString: #,0
+		displayFolder: 07 Climate
+		lineageTag: d1bbb26c-d821-55c8-b290-863de53fd863
+
+	measure 'Electric growth' = VAR y = MAX ( F_Electric[FiscalYear] ) RETURN CALCULATE ( AVERAGE ( F_Electric[GrowthPct] ), F_Electric[FiscalYear] = y )
+		formatString: +#,0.0;-#,0.0;0
+		displayFolder: 07 Climate
+		lineageTag: 5f238aaf-598a-5aea-a920-934bf046eed9
+
+	measure 'Jet fuel avoided' = SUM ( F_Fuel[JetFuelAvoidedMnGal] )
+		formatString: #,0
+		displayFolder: 07 Climate
+		lineageTag: 29f130da-e260-5801-aaab-ede967cf22d1
+
+	measure 'SAF deployed' = CALCULATE ( SUM ( F_SAF[SAFMnGal] ), F_SAF[FiscalYear] = MAX ( F_SAF[FiscalYear] ) )
+		formatString: #,0.0
+		displayFolder: 07 Climate
+		lineageTag: f1eca771-dfcd-58a7-a520-c5f30b5c80e9
+
+	measure 'SAF series' = SUM ( F_SAF[SAFMnGal] )
+		formatString: #,0.0
+		displayFolder: 07 Climate
+		lineageTag: 62528f45-d60a-5153-8e4e-bc17ed744c99
+
+	measure 'Target year' = MIN ( D_Target[Due] )
+		formatString: 0
+		displayFolder: 07 Climate
+		lineageTag: a6df70f3-ff04-53d1-9d44-7d99f8017ab8
+
+	measure 'Years to target' = MIN ( D_Target[Due] ) - 2026
+		formatString: #,0
+		displayFolder: 07 Climate
+		lineageTag: ddbf9e15-693e-5b88-b7c2-79335e47d110
+
+	measure 'Fleet context' = "" & FORMAT ( [Trunk aircraft], "#,0" ) & " trunk, " & FORMAT ( [Feeder aircraft], "#,0" ) & " feeders"
+		displayFolder: 08 Narrative
+		lineageTag: 2b761076-6c16-5a2b-9a42-220f8068bc14
+
+	measure 'Payload context' = "" & FORMAT ( [Fleet payload tonnes], "#,0" ) & " t at full load"
+		displayFolder: 08 Narrative
+		lineageTag: cbc6b44a-f01f-5631-92cc-72c20ff2d542
+
+	measure 'Average payload context' = "Heaviest: " & FORMAT ( MAXX ( ALL ( D_Aircraft ), D_Aircraft[Payload] ), "#,0" ) & " lb"
+		displayFolder: 08 Narrative
+		lineageTag: edd092df-81d9-50fa-8c4e-1cfe1de4567e
+
+	measure 'Boeing context' = "" & FORMAT ( [Boeing payload share], "0.0%" ) & " of lift capacity"
+		displayFolder: 08 Narrative
+		lineageTag: 069e8b14-716b-5461-90d1-381034f9f025
+
+	measure 'Owned context' = "Only " & FORMAT ( [Aircraft leased], "#,0" ) & " on lease"
+		displayFolder: 08 Narrative
+		lineageTag: caf3fba8-1182-544c-8293-177c7ec98188
+
+	measure 'Fleet change context' = "" & FORMAT ( [Aircraft change], "+#,0;-#,0;0" ) & " aircraft on FY" & ( MAX ( F_Fleet[FiscalYear] ) - 1 - 2000 )
+		displayFolder: 08 Narrative
+		lineageTag: f77d2fd3-08b3-5e99-a9eb-352cb0e80416
+
+	measure 'Net income growth context' = "Net margin " & FORMAT ( [Net margin], "0.0%" ) & " · EPS " & FORMAT ( [EPS], "$#,0.00" )
+		displayFolder: 08 Narrative
+		lineageTag: 694fd0ab-b2be-5b12-be31-0dc07b47f983
+
+	measure 'Capex trend context' = "" & FORMAT ( [Capex intensity], "0.0%" ) & " of revenue, a decade low"
+		displayFolder: 08 Narrative
+		lineageTag: 874c6725-8b43-5045-b59b-fcf294442ce0
+
+	measure 'Order context' = "" & FORMAT ( [Aircraft in modification], "#,0" ) & " in pre-service work"
+		displayFolder: 08 Narrative
+		lineageTag: bd739701-b8a6-5a45-8de8-d55f8c119bb4
+
+	measure 'Revenue context' = "" & FORMAT ( [Operating margin], "0.0%" ) & " margin, EPS " & FORMAT ( [EPS], "$#,0.00" )
+		displayFolder: 08 Narrative
+		lineageTag: 414ded2f-ee1c-5bad-bc00-57404f430aaf
+
+	measure 'Volume context' = "" & FORMAT ( [Volume growth], "+0.0%;-0.0%;0.0%" ) & " versus prior year"
+		displayFolder: 08 Narrative
+		lineageTag: 9b87a117-ebbe-518c-8f7c-f03ac116bfc2
+
+	measure 'Hub context' = "" & FORMAT ( [Footprint Msqft], "#,0.0" ) & " million sq ft across " & FORMAT ( [Hubs], "#,0" ) & " facilities"
+		displayFolder: 08 Narrative
+		lineageTag: 8dbc2b7d-6748-55f6-b480-49e62a563033
+
+	measure 'Emissions context' = "" & FORMAT ( [Emissions vs FY2019], "+0.0%;-0.0%;0.0%" ) & " versus FY2019"
+		displayFolder: 08 Narrative
+		lineageTag: 0a879128-b1f3-57f6-980f-e4d12f851e1d
+
+	measure 'Intensity context' = "" & FORMAT ( [Intensity reduction], "+0.0%;-0.0%;0.0%" ) & " since FY2009"
+		displayFolder: 08 Narrative
+		lineageTag: eb5cbf90-0f25-5bab-b5aa-9b4de17c0a9f
+
+	measure 'EV context' = "" & FORMAT ( [Electric growth], "+#,0.0" ) & "% in the latest year"
+		displayFolder: 08 Narrative
+		lineageTag: f54da0ef-4b2c-5423-bced-ee6fe684f313
+
+	measure 'Network context' = "" & FORMAT ( [Airports served], "#,0" ) & "+ airports · 99% GDP"
+		displayFolder: 08 Narrative
+		lineageTag: dff94f3b-ff7a-550f-84ae-033aaeeba10d
+
+	measure 'Vehicle context' = "" & FORMAT ( [Own vehicles] / 1000, "#,0" ) & "k own · " & FORMAT ( [Provider vehicles] / 1000, "#,0" ) & "k hired"
+		displayFolder: 08 Narrative
+		lineageTag: c078bc48-9a43-5ee0-8080-2132d0bafb6c
+
+	measure 'Capacity context' = "Memphis alone sorts " & FORMAT ( CALCULATE ( [Sort capacity], D_Hub[HubKey] = "MEM" ), "#,0" ) & " per hour"
+		displayFolder: 08 Narrative
+		lineageTag: 25b24e4d-32d1-56d2-88fb-3e43e9867179
+
+	measure 'Employee context' = "" & FORMAT ( [Full-time employees] / 1000, "#,0" ) & ",000 of them full-time"
+		displayFolder: 08 Narrative
+		lineageTag: e4872aae-b9bd-5e54-8661-5bb30ad18dba
+
+	measure 'LTL context' = "" & FORMAT ( [LTL revenue per shipment], "$#,0.00" ) & " per shipment"
+		displayFolder: 08 Narrative
+		lineageTag: bffc3e3d-3c38-5b2d-b98c-676596baa620
+
+	measure 'SAF context' = "Blended at 30% minimum"
+		displayFolder: 08 Narrative
+		lineageTag: d8590816-28ef-54c2-ac46-deb9fe156f15
+
+	measure 'Scope 3 context' = "Six categories, FY2025"
+		displayFolder: 08 Narrative
+		lineageTag: 0f65631d-6fa8-519f-b25a-20a3904d9324
+
+	measure 'Facilities context' = "" & FORMAT ( [City stations], "#,0" ) & "+ city stations"
+		displayFolder: 08 Narrative
+		lineageTag: 0e8589dc-3ebe-5a24-9bb9-e17368657b8d
+
+	measure 'Footprint context' = "Memphis: " & FORMAT ( CALCULATE ( [Sq ft], D_Hub[HubKey] = "MEM" ) / 1000000, "#,0.0" ) & "m sq ft"
+		displayFolder: 08 Narrative
+		lineageTag: 0114a366-c682-5ec3-ac3b-110da46548bb
+
+	measure 'Acres context' = "On four continents"
+		displayFolder: 08 Narrative
+		lineageTag: 2f9d2602-33d9-5c51-89c7-a7bed51b3f5b
+
+	measure 'Airports context' = "In 220+ countries"
+		displayFolder: 08 Narrative
+		lineageTag: e03f8bbb-42aa-5582-b09e-de5ff62dfb09
+
+	measure 'Operating income context' = "" & FORMAT ( [Operating margin], "0.0%" ) & " of revenue"
+		displayFolder: 08 Narrative
+		lineageTag: b42cc736-4cf3-535d-9113-4b0ea84e9637
+
+	measure 'Margin context' = "Adjusted margin 7.0%"
+		displayFolder: 08 Narrative
+		lineageTag: 48a54de4-a051-5935-b88d-fc3cf42124ed
+
+	measure 'Revenue growth context' = "" & FORMAT ( [Revenue growth], "+0.0%;-0.0%;0.0%" ) & " on prior year"
+		displayFolder: 08 Narrative
+		lineageTag: 3ed1eef9-2669-5ab1-a0d0-91c8e3380180
+
+	measure 'Net income context' = "Net margin " & FORMAT ( [Net margin], "0.0%" )
+		displayFolder: 08 Narrative
+		lineageTag: e4144163-8de4-5543-a7d6-6690a29576a1
+
+	measure 'EPS context' = "Diluted, US GAAP"
+		displayFolder: 08 Narrative
+		lineageTag: d4d7e4ba-74a5-53aa-a427-91d647eb01c6
+
+	measure 'Capex context' = "" & FORMAT ( [Capex intensity], "0.0%" ) & " of revenue"
+		displayFolder: 08 Narrative
+		lineageTag: 80ba0924-526c-5ec8-9f9e-e2aac9e016f5
+
+	measure 'Hubs context' = "" & FORMAT ( [Footprint Msqft], "#,0.0" ) & "m sq ft, " & FORMAT ( [Hubs], "#,0" ) & " sites"
+		displayFolder: 08 Narrative
+		lineageTag: 1b550a5e-945b-5518-a5e4-66545e99f1ef
+
+	measure 'Capacity k context' = "Memphis sorts " & FORMAT ( CALCULATE ( [Sort capacity], D_Hub[HubKey] = "MEM" ) / 1000, "#,0" ) & "k/h"
+		displayFolder: 08 Narrative
+		lineageTag: f541c10d-d16c-59c7-ae24-f956be16195b
+
+	/// Aviation fuel burned, terajoules, as published in the ESG data table.
+	measure 'Jet fuel' = VAR y = MAX ( F_Energy[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Energy[JetFuel] ), F_Energy[FiscalYear] = y )
+		formatString: #,0
+		displayFolder: 09 Energy & fuel
+		lineageTag: 87f640cc-01fc-5083-bb92-4bd7ec7ee508
+
+	/// Diesel, petrol, LPG and natural gas combined, terajoules.
+	measure 'Vehicle fuel' = VAR y = MAX ( F_Energy[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Energy[VehicleFuel] ), F_Energy[FiscalYear] = y )
+		formatString: #,0
+		displayFolder: 09 Energy & fuel
+		lineageTag: 14a39412-5977-52bc-89a3-02d3d100c789
+
+	measure 'Electricity used' = VAR y = MAX ( F_Energy[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Energy[Electricity] ), F_Energy[FiscalYear] = y )
+		formatString: #,0
+		displayFolder: 09 Energy & fuel
+		lineageTag: a67ec84e-283c-5996-968a-11e678819847
+
+	measure Diesel = VAR y = MAX ( F_Energy[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Energy[Diesel] ), F_Energy[FiscalYear] = y )
+		formatString: #,0
+		displayFolder: 09 Energy & fuel
+		lineageTag: 919046e8-09a1-559e-9e4b-aab26a53a6a3
+
+	measure Biodiesel = VAR y = MAX ( F_Energy[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Energy[Biodiesel] ), F_Energy[FiscalYear] = y )
+		formatString: #,0
+		displayFolder: 09 Energy & fuel
+		lineageTag: 698b305b-0233-5f32-95fb-d43e1be0a366
+
+	/// Scope 1 and 2 energy consumption, terajoules.
+	measure 'Total energy' = VAR y = MAX ( F_Energy[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Energy[TotalEnergy] ), F_Energy[FiscalYear] = y )
+		formatString: #,0
+		displayFolder: 09 Energy & fuel
+		lineageTag: 6ac874a0-da28-5dd8-98f2-cae5dd16d40d
+
+	measure 'Energy incl. Scope 3' = VAR y = MAX ( F_Energy[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Energy[TotalInclScope3] ), F_Energy[FiscalYear] = y )
+		formatString: #,0
+		displayFolder: 09 Energy & fuel
+		lineageTag: 81561d4d-f404-58b1-8a3e-5a134414e0f5
+
+	/// Terajoules per million dollars of revenue.
+	measure 'Energy intensity' = VAR y = MAX ( F_Energy[FiscalYear] ) RETURN CALCULATE ( AVERAGE ( F_Energy[IntensityTJperMn] ), F_Energy[FiscalYear] = y )
+		formatString: #,0.00
+		displayFolder: 09 Energy & fuel
+		lineageTag: 2831b5d5-b06a-592c-897a-333c9401f482
+
+	measure 'Jet fuel share' = VAR y = MAX ( F_Energy[FiscalYear] ) RETURN CALCULATE ( AVERAGE ( F_Energy[JetSharePct] ), F_Energy[FiscalYear] = y ) / 100
+		formatString: 0.0%
+		displayFolder: 09 Energy & fuel
+		lineageTag: 909d152b-ce7c-5856-9dfc-895fcb176436
+
+	measure 'Jet fuel PJ' = DIVIDE ( [Jet fuel], 1000 )
+		formatString: #,0.0
+		displayFolder: 09 Energy & fuel
+		lineageTag: b5e3dea5-85a5-5687-ae60-80ce27a6e025
+
+	measure 'Total energy PJ' = DIVIDE ( [Total energy], 1000 )
+		formatString: #,0.0
+		displayFolder: 09 Energy & fuel
+		lineageTag: a9165e73-f7f3-50e2-b8bf-0c2e36a666d7
+
+	measure 'Energy by year' = SUM ( F_EnergySource[Energy] )
+		formatString: #,0
+		displayFolder: 09 Energy & fuel
+		lineageTag: c0cb2b1c-c647-50eb-b925-1331da5d0aa7
+
+	measure Terajoules = VAR y = MAX ( F_EnergySource[FiscalYear] ) RETURN CALCULATE ( SUM ( F_EnergySource[Energy] ), F_EnergySource[FiscalYear] = y )
+		formatString: #,0
+		displayFolder: 09 Energy & fuel
+		lineageTag: 39f3a387-37df-5e39-80c4-a68a036efa21
+
+	measure 'Of total' = DIVIDE ( [Terajoules], CALCULATE ( [Terajoules], REMOVEFILTERS ( F_EnergySource ) ) )
+		formatString: 0.0%
+		displayFolder: 09 Energy & fuel
+		lineageTag: 3dc7835a-87d6-524b-bf9d-d14708ad0d3e
+
+	measure 'Jet fuel base' = CALCULATE ( [Jet fuel], REMOVEFILTERS ( D_FiscalYear ), F_Energy[FiscalYear] = 2022 )
+		formatString: #,0
+		displayFolder: 09 Energy & fuel
+		lineageTag: 8d9e661b-837a-515a-94e9-9b03f518b5d2
+
+	measure 'Jet fuel vs FY2022' = DIVIDE ( [Jet fuel] - [Jet fuel base], [Jet fuel base] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 09 Energy & fuel
+		lineageTag: c2373188-501a-5402-a3f2-136c60917cda
+
+	measure 'Total energy base' = CALCULATE ( [Total energy], REMOVEFILTERS ( D_FiscalYear ), F_Energy[FiscalYear] = 2022 )
+		formatString: #,0
+		displayFolder: 09 Energy & fuel
+		lineageTag: bc68f9bb-c0b0-5d04-9d5f-12e416e61746
+
+	measure 'Energy vs FY2022' = DIVIDE ( [Total energy] - [Total energy base], [Total energy base] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 09 Energy & fuel
+		lineageTag: 6d74bbd6-5f66-537e-8744-9ce631f42334
+
+	/// Litres of jet fuel per available ton mile, FedEx Express fleet.
+	measure 'Aviation efficiency' = VAR y = MAX ( F_Efficiency[FiscalYear] ) RETURN CALCULATE ( AVERAGE ( F_Efficiency[AviationLperATM] ), F_Efficiency[FiscalYear] = y )
+		formatString: #,0.000
+		displayFolder: 09 Energy & fuel
+		lineageTag: 1dfed83c-0483-558f-9ad3-afb7e23edc8c
+
+	measure 'Aviation litres' = VAR y = MAX ( F_Efficiency[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Efficiency[AviationLitres] ), F_Efficiency[FiscalYear] = y )
+		formatString: #,0
+		displayFolder: 09 Energy & fuel
+		lineageTag: 8e833ed7-a31e-5e64-8cac-3d8260d33795
+
+	measure 'Aviation litres bn' = DIVIDE ( [Aviation litres], 1000000000 )
+		formatString: #,0.00
+		displayFolder: 09 Energy & fuel
+		lineageTag: 72df842a-8d41-505a-bf34-c51218b8a13e
+
+	measure 'Available ton miles' = VAR y = MAX ( F_Efficiency[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Efficiency[AvailableTonMiles] ), F_Efficiency[FiscalYear] = y )
+		formatString: #,0
+		displayFolder: 09 Energy & fuel
+		lineageTag: e6729b57-10ae-50b9-9d3f-bf8ba38bb369
+
+	measure 'Available ton miles bn' = DIVIDE ( [Available ton miles], 1000000000 )
+		formatString: #,0.0
+		displayFolder: 09 Energy & fuel
+		lineageTag: 4b7414bb-46ff-5011-b84d-ea36590fec34
+
+	/// Reduction in aircraft emissions intensity against the 2005 baseline.
+	measure 'Aircraft intensity cut' = VAR y = MAX ( F_AviationIntensity[FiscalYear] ) RETURN CALCULATE ( SUM ( F_AviationIntensity[ReductionVs2005Pct] ), F_AviationIntensity[FiscalYear] = y ) / 100
+		formatString: 0%
+		displayFolder: 09 Energy & fuel
+		lineageTag: 0bee66f1-06ad-55bb-806b-76bc2c8bec34
+
+	measure 'Efficiency series' = AVERAGE ( F_Efficiency[AviationLperATM] )
+		formatString: #,0.000
+		displayFolder: 09 Energy & fuel
+		lineageTag: 143bf4d0-57c9-593a-baf9-d851397f333e
+
+	measure 'Energy series' = SUM ( F_Energy[TotalEnergy] )
+		formatString: #,0
+		displayFolder: 09 Energy & fuel
+		lineageTag: 9efbebfc-21b0-5602-b2d3-5dbe332112f6
+
+	measure 'Jet fuel series' = SUM ( F_Energy[JetFuel] )
+		formatString: #,0
+		displayFolder: 09 Energy & fuel
+		lineageTag: a4cb7613-f0fb-5240-af8f-8d5665016027
+
+	measure 'Jet fuel context' = "" & FORMAT ( [Jet fuel vs FY2022], "+0.0%;-0.0%;0.0%" ) & " since FY2022"
+		displayFolder: 08 Narrative
+		lineageTag: 12827141-79f5-545e-9739-1ead4ad7c960
+
+	measure 'Vehicle fuel context' = "Diesel is " & FORMAT ( DIVIDE ( [Diesel], [Vehicle fuel] ), "0%" ) & " of it"
+		displayFolder: 08 Narrative
+		lineageTag: e02eb29a-421b-5021-aed8-a4f5e62cd457
+
+	measure 'Electricity context' = "96.7 GWh renewable"
+		displayFolder: 08 Narrative
+		lineageTag: 88bfabec-a88a-5705-913c-aabda45cccfb
+
+	measure 'Total energy context' = "" & FORMAT ( [Energy vs FY2022], "+0.0%;-0.0%;0.0%" ) & " since FY2022"
+		displayFolder: 08 Narrative
+		lineageTag: a7c42f83-c3bb-5f65-bdf3-f2718cbaec64
+
+	measure 'Energy intensity context' = "TJ per $m of revenue"
+		displayFolder: 08 Narrative
+		lineageTag: a4146cfd-85a2-5e19-bb45-40bd814b2035
+
+	measure 'Aviation efficiency context' = "" & FORMAT ( [Aviation litres bn], "#,0.00" ) & "bn litres flown"
+		displayFolder: 08 Narrative
+		lineageTag: ce8d83cd-0226-5e81-9451-7c4c44ec6cbe
+
+	measure 'Jet share context' = "of all Scope 1 and 2 energy"
+		displayFolder: 08 Narrative
+		lineageTag: 17a402a5-05a3-5f55-bb0b-d5e49b560921
+
+	measure 'Aircraft cut context' = "Cut since 2005"
+		displayFolder: 08 Narrative
+		lineageTag: b1f16b5d-9f53-5217-af9e-265d82deae2c
+
+	measure 'Fleet %' = FORMAT ( DIVIDE ( [Aircraft], [Fleet total] ), "0.0%" )
+		displayFolder: 08 Narrative
+		lineageTag: 8f1d3a3e-b84e-5cef-88f5-b500f5ccb5cd
+
+	measure 'Lift %' = FORMAT ( [Payload share], "0.0%" )
+		displayFolder: 08 Narrative
+		lineageTag: fa6cf449-062b-51eb-9239-bd080cfa2111
+
+	measure Ownership = IF ( [Aircraft leased] = 0, "All owned", FORMAT ( [Aircraft owned], "#,0" ) & " owned · " & FORMAT ( [Aircraft leased], "#,0" ) & " leased" )
+		displayFolder: 08 Narrative
+		lineageTag: 45eb32a3-e0b5-5fb7-be49-94cb5fc7e40f
+
+	measure 'Lease label' = FORMAT ( MIN ( D_Hub[Lease to] ), "0" )
+		displayFolder: 08 Narrative
+		lineageTag: 46132e5b-5f57-5f34-912f-422cd2f00786
+
+	column Placeholder
+		dataType: string
+		isHidden
+		lineageTag: b2ab0a2d-fe2f-50f8-83be-479a8ac428d5
+		summarizeBy: none
+		sourceColumn: [Placeholder]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Metrics = calculated
+		mode: import
+		source = ROW ( "Placeholder", "" )
+
+	annotation PBI_Id = Metrics

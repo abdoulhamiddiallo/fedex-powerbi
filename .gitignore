@@ -1,0 +1,19 @@
+# Power BI Desktop local state
+.pbi/
+*.pbix
+*.abf
+localSettings.json
+
+# Build previews (regenerate with: python src/render_pages.py)
+apercus/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini

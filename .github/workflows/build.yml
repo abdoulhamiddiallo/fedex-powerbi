@@ -1,0 +1,53 @@
+name: build
+
+# The report is code. Every push rebuilds all 502 visuals from scratch and runs the
+# quality gate. A truncated label or a broken DAX reference fails the build, not the review.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Rebuild the project from scratch
+        run: |
+          rm -rf Donnees FedEx.Report FedEx.SemanticModel
+          cd src
+          python gen_data.py
+          python gen_model.py
+          python gen_report.py
+
+      - name: Quality gate
+        run: cd src && python check.py
+
+      - name: Verify the build is deterministic
+        run: |
+          cp -r FedEx.Report /tmp/first
+          rm -rf FedEx.Report
+          cd src && python gen_report.py && cd ..
+          diff -r /tmp/first FedEx.Report
+
+      - name: Confirm no personal path leaked into the model
+        run: |
+          ! grep -rn "Users\\\\" FedEx.SemanticModel/
+
+      - name: Render page previews
+        run: cd src && python render_pages.py
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: page-previews
+          path: apercus/*.png

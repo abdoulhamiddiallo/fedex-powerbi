@@ -1,0 +1,148 @@
+table D_Aircraft
+	lineageTag: bbb0f8b0-33a5-530b-8c18-2e5b8d5897a2
+
+	column AircraftKey
+		dataType: string
+		isHidden
+		lineageTag: 5188e492-1d49-5500-9466-cf38cefd5260
+		summarizeBy: none
+		sourceColumn: AircraftKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Type
+		dataType: string
+		lineageTag: 4df9256c-0680-563a-915f-0bee80efd7d6
+		summarizeBy: none
+		sourceColumn: AircraftType
+		sortByColumn: SortOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column Manufacturer
+		dataType: string
+		lineageTag: b8e7803e-a714-5894-96e5-ece238cdbcc2
+		summarizeBy: none
+		sourceColumn: Manufacturer
+
+		annotation SummarizationSetBy = Automatic
+
+	column Family
+		dataType: string
+		lineageTag: 6a8e2e1f-2113-5b2d-bebf-a6424e9b2233
+		summarizeBy: none
+		sourceColumn: Family
+
+		annotation SummarizationSetBy = Automatic
+
+	column Class
+		dataType: string
+		lineageTag: d676cce8-87cf-5c2e-8f88-26e2d8d0970c
+		summarizeBy: none
+		sourceColumn: FleetClass
+
+		annotation SummarizationSetBy = Automatic
+
+	column Payload
+		dataType: int64
+		formatString: #,0
+		lineageTag: 78f3450b-6738-5a39-b7a2-5a01735a72c2
+		summarizeBy: none
+		sourceColumn: PayloadLbs
+
+		annotation SummarizationSetBy = Automatic
+
+	column Owned
+		dataType: int64
+		formatString: #,0
+		lineageTag: 7a698a12-08d0-5264-ba0d-7fade8e3f77e
+		summarizeBy: none
+		sourceColumn: Owned
+
+		annotation SummarizationSetBy = Automatic
+
+	column Leased
+		dataType: int64
+		formatString: #,0
+		lineageTag: 9dbda753-addd-5cef-bec7-25d64d584b88
+		summarizeBy: none
+		sourceColumn: Leased
+
+		annotation SummarizationSetBy = Automatic
+
+	column InFleet
+		dataType: int64
+		formatString: #,0
+		lineageTag: 55f3ab21-d29b-588b-bb25-418bbdbd94c1
+		summarizeBy: none
+		sourceColumn: InFleet
+
+		annotation SummarizationSetBy = Automatic
+
+	column NotInService
+		dataType: int64
+		formatString: #,0
+		lineageTag: f2e6fd0f-86e8-5fb7-ad1c-4723238dfdec
+		summarizeBy: none
+		sourceColumn: NotInService
+
+		annotation SummarizationSetBy = Automatic
+
+	column OnOrder
+		dataType: int64
+		formatString: #,0
+		lineageTag: f9e54bdf-954d-538b-bd57-7edb498143e3
+		summarizeBy: none
+		sourceColumn: OnOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column FleetPayloadLbs
+		dataType: int64
+		formatString: #,0
+		lineageTag: c5fa11ed-c8c3-59c1-9393-a285d3353051
+		summarizeBy: none
+		sourceColumn: FleetPayloadLbs
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsBoeing
+		dataType: int64
+		isHidden
+		formatString: #,0
+		lineageTag: 600d2e39-ea0f-596c-bab0-89f70e4d66e3
+		summarizeBy: none
+		sourceColumn: IsBoeing
+
+		annotation SummarizationSetBy = Automatic
+
+	column SortOrder
+		dataType: int64
+		isHidden
+		formatString: #,0
+		lineageTag: 06e943f8-3005-5580-9456-488b3263352f
+		summarizeBy: none
+		sourceColumn: SortOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column InServiceSince
+		dataType: int64
+		formatString: 0
+		lineageTag: c0b7205b-5dd8-5f7e-88b0-9bb1c03b7a2d
+		summarizeBy: none
+		sourceColumn: InServiceSince
+
+		annotation SummarizationSetBy = Automatic
+
+	partition D_Aircraft = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DossierDonnees & "\D_Aircraft.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Types = Table.TransformColumnTypes(Entetes, {{"AircraftKey", type text}, {"AircraftType", type text}, {"Manufacturer", type text}, {"Family", type text}, {"FleetClass", type text}, {"PayloadLbs", Int64.Type}, {"Owned", Int64.Type}, {"Leased", Int64.Type}, {"InFleet", Int64.Type}, {"NotInService", Int64.Type}, {"OnOrder", Int64.Type}, {"FleetPayloadLbs", Int64.Type}, {"IsBoeing", Int64.Type}, {"SortOrder", Int64.Type}, {"InServiceSince", Int64.Type}}, "en-US")
+				in
+				    Types
+
+	annotation PBI_ResultType = Table

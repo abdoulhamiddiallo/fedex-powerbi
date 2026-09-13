@@ -1,0 +1,41 @@
+table F_SAF
+	lineageTag: 3cebc001-b9d2-52fe-be49-c87742b62b7c
+
+	column FiscalYear
+		dataType: int64
+		formatString: 0
+		lineageTag: d5f07097-cbd9-5ba2-a4ee-6782c0ea9347
+		summarizeBy: none
+		sourceColumn: FiscalYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column SAFMnGal
+		dataType: double
+		formatString: #,0.0
+		lineageTag: 109dcf1e-e15d-50cc-b20f-2a6f4f84c533
+		summarizeBy: none
+		sourceColumn: SAFMnGal
+
+		annotation SummarizationSetBy = Automatic
+
+	column Note
+		dataType: string
+		isHidden
+		lineageTag: fdec6d6a-7cbd-5440-9d7e-e538a3866be4
+		summarizeBy: none
+		sourceColumn: Note
+
+		annotation SummarizationSetBy = Automatic
+
+	partition F_SAF = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DossierDonnees & "\F_SAF.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Types = Table.TransformColumnTypes(Entetes, {{"FiscalYear", Int64.Type}, {"SAFMnGal", type number}, {"Note", type text}}, "en-US")
+				in
+				    Types
+
+	annotation PBI_ResultType = Table

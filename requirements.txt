@@ -1,0 +1,3 @@
+# Build chain dependencies (Python 3.11+)
+pillow>=10.0          # every generated asset: map, icons, silhouettes, textures
+global-land-mask>=1.0 # land/sea mask used to plot the dot-matrix planisphere

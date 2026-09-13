@@ -1,0 +1,7 @@
+Service,ServiceGroup,SortOrder,Revenue,ADV,Yield,ADVPrior,YieldPrior,ADVChange,ADVGrowthPct
+U.S. priority,U.S. domestic,1,11603,1654,26.13,1600,25.3,54,3.37
+U.S. deferred,U.S. domestic,2,5700,1061,18.76,968,18.59,93,9.61
+U.S. ground,U.S. domestic,3,37335,11205,12.07,10727,11.73,478,4.46
+International priority,International export,4,9639,562,62.77,622,55.37,-60,-9.65
+International economy,International export,5,5925,518,40.87,491,43.33,27,5.5
+International domestic,International,6,4725,1806,9.81,1823,9.53,-17,-0.93

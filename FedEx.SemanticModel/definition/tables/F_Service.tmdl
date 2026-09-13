@@ -1,0 +1,104 @@
+table F_Service
+	lineageTag: 5310ad30-8c43-56e1-b207-a5d7b212b835
+
+	column Service
+		dataType: string
+		lineageTag: 0dd3dfbd-f498-5a7a-8a51-934e047dcf0e
+		summarizeBy: none
+		sourceColumn: Service
+		sortByColumn: SortOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column ServiceGroup
+		dataType: string
+		lineageTag: a648a4f7-5b97-51b3-bcf8-36272605f28a
+		summarizeBy: none
+		sourceColumn: ServiceGroup
+
+		annotation SummarizationSetBy = Automatic
+
+	column SortOrder
+		dataType: int64
+		isHidden
+		formatString: #,0
+		lineageTag: e57e25da-2d1b-58a2-9937-7bcaee10f8b5
+		summarizeBy: none
+		sourceColumn: SortOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column Revenue
+		dataType: int64
+		formatString: #,0
+		lineageTag: 17b8b8c1-cb52-542a-8593-d06b3f8543d8
+		summarizeBy: none
+		sourceColumn: Revenue
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Daily volume (k)'
+		dataType: int64
+		formatString: #,0
+		lineageTag: 60ffc040-4912-571b-a472-d7a212b9ec81
+		summarizeBy: none
+		sourceColumn: ADV
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Yield ($)'
+		dataType: double
+		formatString: $#,0.00
+		lineageTag: 2a7cc5e7-a945-5e68-8190-73d021f37cd5
+		summarizeBy: none
+		sourceColumn: Yield
+
+		annotation SummarizationSetBy = Automatic
+
+	column ADVPrior
+		dataType: int64
+		formatString: #,0
+		lineageTag: f8f35afd-3a2d-5bed-850a-603b1503e291
+		summarizeBy: none
+		sourceColumn: ADVPrior
+
+		annotation SummarizationSetBy = Automatic
+
+	column YieldPrior
+		dataType: double
+		formatString: $#,0.00
+		lineageTag: 9a398aae-da22-5b82-b004-fd3c7ff36aaa
+		summarizeBy: none
+		sourceColumn: YieldPrior
+
+		annotation SummarizationSetBy = Automatic
+
+	column ADVChange
+		dataType: int64
+		formatString: #,0
+		lineageTag: c9b512b8-90f5-5f1b-a730-d3be28974c67
+		summarizeBy: none
+		sourceColumn: ADVChange
+
+		annotation SummarizationSetBy = Automatic
+
+	column ADVGrowthPct
+		dataType: double
+		formatString: #,0.00
+		lineageTag: aebe391f-2216-55d1-af77-7c49df7ff32a
+		summarizeBy: none
+		sourceColumn: ADVGrowthPct
+
+		annotation SummarizationSetBy = Automatic
+
+	partition F_Service = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DossierDonnees & "\F_Service.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Types = Table.TransformColumnTypes(Entetes, {{"Service", type text}, {"ServiceGroup", type text}, {"SortOrder", Int64.Type}, {"Revenue", Int64.Type}, {"ADV", Int64.Type}, {"Yield", type number}, {"ADVPrior", Int64.Type}, {"YieldPrior", type number}, {"ADVChange", Int64.Type}, {"ADVGrowthPct", type number}}, "en-US")
+				in
+				    Types
+
+	annotation PBI_ResultType = Table

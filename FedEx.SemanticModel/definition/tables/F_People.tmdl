@@ -1,0 +1,50 @@
+table F_People
+	lineageTag: 0e283765-f218-593c-93b8-a7a5cc8fd364
+
+	column FiscalYear
+		dataType: int64
+		formatString: 0
+		lineageTag: 4a0d0d35-6f77-5827-adc7-91d8980f38bc
+		summarizeBy: none
+		sourceColumn: FiscalYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column FullTime
+		dataType: int64
+		formatString: #,0
+		lineageTag: d73471f4-cf47-56b2-b42b-5d020678d64a
+		summarizeBy: none
+		sourceColumn: FullTime
+
+		annotation SummarizationSetBy = Automatic
+
+	column PartTime
+		dataType: int64
+		formatString: #,0
+		lineageTag: 2dc78c1e-db84-53be-a16d-980a8bcebf46
+		summarizeBy: none
+		sourceColumn: PartTime
+
+		annotation SummarizationSetBy = Automatic
+
+	column Total
+		dataType: int64
+		formatString: #,0
+		lineageTag: ace97582-6a83-5571-a5fe-735262d2912c
+		summarizeBy: none
+		sourceColumn: Total
+
+		annotation SummarizationSetBy = Automatic
+
+	partition F_People = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DossierDonnees & "\F_People.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Types = Table.TransformColumnTypes(Entetes, {{"FiscalYear", Int64.Type}, {"FullTime", Int64.Type}, {"PartTime", Int64.Type}, {"Total", Int64.Type}}, "en-US")
+				in
+				    Types
+
+	annotation PBI_ResultType = Table

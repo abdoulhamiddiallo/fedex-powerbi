@@ -1,0 +1,41 @@
+table F_Intensity
+	lineageTag: 65e8a598-f08e-5879-bee3-5c2ec1c640a8
+
+	column FiscalYear
+		dataType: int64
+		formatString: 0
+		lineageTag: fcb5e7ed-8992-5794-9819-b0eaa76044be
+		summarizeBy: none
+		sourceColumn: FiscalYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column IntensityPerRevenueMn
+		dataType: double
+		formatString: #,0.00
+		lineageTag: d0637458-9b6f-5938-8d43-0411b832eb7c
+		summarizeBy: none
+		sourceColumn: IntensityPerRevenueMn
+
+		annotation SummarizationSetBy = Automatic
+
+	column IndexBase2009
+		dataType: double
+		formatString: #,0.0
+		lineageTag: 3de030fd-6437-50be-947c-2e0be8aa502b
+		summarizeBy: none
+		sourceColumn: IndexBase2009
+
+		annotation SummarizationSetBy = Automatic
+
+	partition F_Intensity = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DossierDonnees & "\F_Intensity.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Types = Table.TransformColumnTypes(Entetes, {{"FiscalYear", Int64.Type}, {"IntensityPerRevenueMn", type number}, {"IndexBase2009", type number}}, "en-US")
+				in
+				    Types
+
+	annotation PBI_ResultType = Table

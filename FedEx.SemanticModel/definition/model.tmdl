@@ -1,0 +1,37 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation PBI_QueryOrder = ["D_FiscalYear", "D_Aircraft", "F_Fleet", "F_FleetPlan", "D_Hub", "F_Financial", "F_Segment", "F_Service", "F_Geography", "F_Freight", "F_Climate", "F_Intensity", "F_Scope3", "F_Electric", "F_Fuel", "F_SAF", "D_Target", "F_Network", "F_People", "F_Energy", "F_EnergySource", "F_Efficiency", "F_AviationIntensity", "DossierDonnees"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table D_FiscalYear
+ref table D_Aircraft
+ref table F_Fleet
+ref table F_FleetPlan
+ref table D_Hub
+ref table F_Financial
+ref table F_Segment
+ref table F_Service
+ref table F_Geography
+ref table F_Freight
+ref table F_Climate
+ref table F_Intensity
+ref table F_Scope3
+ref table F_Electric
+ref table F_Fuel
+ref table F_SAF
+ref table D_Target
+ref table F_Network
+ref table F_People
+ref table F_Energy
+ref table F_EnergySource
+ref table F_Efficiency
+ref table F_AviationIntensity
+ref table Metrics

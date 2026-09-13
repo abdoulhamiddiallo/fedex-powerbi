@@ -1,0 +1,408 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/3.3.0/schema.json",
+  "themeCollection": {
+    "baseTheme": {
+      "name": "Fluent2-CY26SU08",
+      "reportVersionAtImport": {
+        "visual": "2.12.0",
+        "report": "3.4.0",
+        "page": "2.3.1"
+      },
+      "type": "SharedResources"
+    },
+    "customTheme": {
+      "name": "ThemeMeridian",
+      "reportVersionAtImport": {
+        "visual": "2.12.0",
+        "report": "3.4.0",
+        "page": "2.3.1"
+      },
+      "type": "RegisteredResources"
+    }
+  },
+  "objects": {
+    "section": [
+      {
+        "properties": {
+          "verticalAlignment": {
+            "expr": {
+              "Literal": {
+                "Value": "'Top'"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outspacePane": [
+      {
+        "properties": {
+          "expanded": {
+            "expr": {
+              "Literal": {
+                "Value": "false"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "resourcePackages": [
+    {
+      "name": "SharedResources",
+      "type": "SharedResources",
+      "items": [
+        {
+          "name": "Fluent2-CY26SU08",
+          "path": "BaseThemes/Fluent2-CY26SU08.json",
+          "type": "BaseTheme"
+        }
+      ]
+    },
+    {
+      "name": "RegisteredResources",
+      "type": "RegisteredResources",
+      "items": [
+        {
+          "name": "ac_narrow.png",
+          "path": "ac_narrow.png",
+          "type": "Image"
+        },
+        {
+          "name": "ac_single.png",
+          "path": "ac_single.png",
+          "type": "Image"
+        },
+        {
+          "name": "ac_turbo.png",
+          "path": "ac_turbo.png",
+          "type": "Image"
+        },
+        {
+          "name": "ac_wide2.png",
+          "path": "ac_wide2.png",
+          "type": "Image"
+        },
+        {
+          "name": "ac_wide3.png",
+          "path": "ac_wide3.png",
+          "type": "Image"
+        },
+        {
+          "name": "bg.png",
+          "path": "bg.png",
+          "type": "Image"
+        },
+        {
+          "name": "fedex_logo.png",
+          "path": "fedex_logo.png",
+          "type": "Image"
+        },
+        {
+          "name": "ic_bolt_off.png",
+          "path": "ic_bolt_off.png",
+          "type": "Image"
+        },
+        {
+          "name": "ic_bolt_on.png",
+          "path": "ic_bolt_on.png",
+          "type": "Image"
+        },
+        {
+          "name": "ic_chart_off.png",
+          "path": "ic_chart_off.png",
+          "type": "Image"
+        },
+        {
+          "name": "ic_chart_on.png",
+          "path": "ic_chart_on.png",
+          "type": "Image"
+        },
+        {
+          "name": "ic_hub_off.png",
+          "path": "ic_hub_off.png",
+          "type": "Image"
+        },
+        {
+          "name": "ic_hub_on.png",
+          "path": "ic_hub_on.png",
+          "type": "Image"
+        },
+        {
+          "name": "ic_leaf_off.png",
+          "path": "ic_leaf_off.png",
+          "type": "Image"
+        },
+        {
+          "name": "ic_leaf_on.png",
+          "path": "ic_leaf_on.png",
+          "type": "Image"
+        },
+        {
+          "name": "ic_plane_off.png",
+          "path": "ic_plane_off.png",
+          "type": "Image"
+        },
+        {
+          "name": "ic_plane_on.png",
+          "path": "ic_plane_on.png",
+          "type": "Image"
+        },
+        {
+          "name": "ic_pulse_off.png",
+          "path": "ic_pulse_off.png",
+          "type": "Image"
+        },
+        {
+          "name": "ic_pulse_on.png",
+          "path": "ic_pulse_on.png",
+          "type": "Image"
+        },
+        {
+          "name": "ic_truck_off.png",
+          "path": "ic_truck_off.png",
+          "type": "Image"
+        },
+        {
+          "name": "ic_truck_on.png",
+          "path": "ic_truck_on.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_area.png",
+          "path": "ki_area.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_bolt.png",
+          "path": "ki_bolt.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_building.png",
+          "path": "ki_building.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_chain.png",
+          "path": "ki_chain.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_chart.png",
+          "path": "ki_chart.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_cloud.png",
+          "path": "ki_cloud.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_coin.png",
+          "path": "ki_coin.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_dollar.png",
+          "path": "ki_dollar.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_factory.png",
+          "path": "ki_factory.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_fuel.png",
+          "path": "ki_fuel.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_gauge.png",
+          "path": "ki_gauge.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_globe.png",
+          "path": "ki_globe.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_invest.png",
+          "path": "ki_invest.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_key.png",
+          "path": "ki_key.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_land.png",
+          "path": "ki_land.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_order.png",
+          "path": "ki_order.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_pallet.png",
+          "path": "ki_pallet.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_parcel.png",
+          "path": "ki_parcel.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_people.png",
+          "path": "ki_people.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_percent.png",
+          "path": "ki_percent.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_plane.png",
+          "path": "ki_plane.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_plug.png",
+          "path": "ki_plug.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_scale.png",
+          "path": "ki_scale.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_share.png",
+          "path": "ki_share.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_sort.png",
+          "path": "ki_sort.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_tower.png",
+          "path": "ki_tower.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_truck.png",
+          "path": "ki_truck.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_warehouse.png",
+          "path": "ki_warehouse.png",
+          "type": "Image"
+        },
+        {
+          "name": "ki_weight.png",
+          "path": "ki_weight.png",
+          "type": "Image"
+        },
+        {
+          "name": "mark.png",
+          "path": "mark.png",
+          "type": "Image"
+        },
+        {
+          "name": "network_map.png",
+          "path": "network_map.png",
+          "type": "Image"
+        },
+        {
+          "name": "px_acc_4ade80.png",
+          "path": "px_acc_4ade80.png",
+          "type": "Image"
+        },
+        {
+          "name": "px_acc_60a5fa.png",
+          "path": "px_acc_60a5fa.png",
+          "type": "Image"
+        },
+        {
+          "name": "px_acc_8a3fe0.png",
+          "path": "px_acc_8a3fe0.png",
+          "type": "Image"
+        },
+        {
+          "name": "px_acc_b57cf6.png",
+          "path": "px_acc_b57cf6.png",
+          "type": "Image"
+        },
+        {
+          "name": "px_acc_ff4d6a.png",
+          "path": "px_acc_ff4d6a.png",
+          "type": "Image"
+        },
+        {
+          "name": "px_acc_ff6600.png",
+          "path": "px_acc_ff6600.png",
+          "type": "Image"
+        },
+        {
+          "name": "px_acc_ff9248.png",
+          "path": "px_acc_ff9248.png",
+          "type": "Image"
+        },
+        {
+          "name": "px_acc_ffb800.png",
+          "path": "px_acc_ffb800.png",
+          "type": "Image"
+        },
+        {
+          "name": "px_panel.png",
+          "path": "px_panel.png",
+          "type": "Image"
+        },
+        {
+          "name": "px_rail.png",
+          "path": "px_rail.png",
+          "type": "Image"
+        },
+        {
+          "name": "px_railon.png",
+          "path": "px_railon.png",
+          "type": "Image"
+        },
+        {
+          "name": "px_tile.png",
+          "path": "px_tile.png",
+          "type": "Image"
+        },
+        {
+          "name": "wordmark.png",
+          "path": "wordmark.png",
+          "type": "Image"
+        },
+        {
+          "name": "ThemeMeridian",
+          "path": "ThemeMeridian",
+          "type": "CustomTheme"
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "useStylableVisualContainerHeader": true,
+    "exportDataMode": "AllowSummarized",
+    "defaultDrillFilterOtherVisuals": true,
+    "allowChangeFilterTypes": true,
+    "useEnhancedTooltips": true,
+    "useDefaultAggregateDisplayName": true
+  }
+}

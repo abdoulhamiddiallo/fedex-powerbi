@@ -1,0 +1,99 @@
+table D_FiscalYear
+	lineageTag: 7dc6770b-5216-5b6b-892b-0c890461db4e
+
+	column FiscalYear
+		dataType: int64
+		formatString: 0
+		lineageTag: 69948ec9-e3b5-5914-87ec-f55d8ec8f82c
+		summarizeBy: none
+		sourceColumn: FiscalYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column FiscalYearLabel
+		dataType: string
+		lineageTag: 65d2b246-b9d6-5420-ba64-b53727dbf0ec
+		summarizeBy: none
+		sourceColumn: FiscalYearLabel
+		sortByColumn: FiscalYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column FiscalYearShort
+		dataType: string
+		lineageTag: 5a8ec1f2-4fa2-589e-9000-05f484203ed7
+		summarizeBy: none
+		sourceColumn: FiscalYearShort
+		sortByColumn: FiscalYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsCurrent
+		dataType: int64
+		isHidden
+		formatString: #,0
+		lineageTag: e622d9fa-40f3-5f27-ba8a-a6cdde6633a9
+		summarizeBy: none
+		sourceColumn: IsCurrent
+
+		annotation SummarizationSetBy = Automatic
+
+	column PeriodEnd
+		dataType: string
+		lineageTag: d2fcb7be-1bad-50a9-84c2-b1344cd1490b
+		summarizeBy: none
+		sourceColumn: PeriodEnd
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsFinancial
+		dataType: int64
+		isHidden
+		formatString: #,0
+		lineageTag: 9cc622f1-8a60-552f-9721-63269b2bdb9b
+		summarizeBy: none
+		sourceColumn: IsFinancial
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsFleet
+		dataType: int64
+		isHidden
+		formatString: #,0
+		lineageTag: 600b8cfa-53dc-5a62-b00a-2ab11ee74a16
+		summarizeBy: none
+		sourceColumn: IsFleet
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsClimate
+		dataType: int64
+		isHidden
+		formatString: #,0
+		lineageTag: 73e613fa-6272-5554-a3dc-59244825575b
+		summarizeBy: none
+		sourceColumn: IsClimate
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsEnergy
+		dataType: int64
+		isHidden
+		formatString: #,0
+		lineageTag: 1e8ae45b-5d9c-5958-9c57-b7bee784f777
+		summarizeBy: none
+		sourceColumn: IsEnergy
+
+		annotation SummarizationSetBy = Automatic
+
+	partition D_FiscalYear = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DossierDonnees & "\D_FiscalYear.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Types = Table.TransformColumnTypes(Entetes, {{"FiscalYear", Int64.Type}, {"FiscalYearLabel", type text}, {"FiscalYearShort", type text}, {"IsCurrent", Int64.Type}, {"PeriodEnd", type text}, {"IsFinancial", Int64.Type}, {"IsFleet", Int64.Type}, {"IsClimate", Int64.Type}, {"IsEnergy", Int64.Type}}, "en-US")
+				in
+				    Types
+
+	annotation PBI_ResultType = Table

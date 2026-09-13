@@ -1,0 +1,16 @@
+HubKey,Hub,City,Region,Country,Continent,HubClass,Acres,SquareFeet,SortCapacityHr,Lessor,LeaseExpiry,Latitude,Longitude,SortOrder,PiecesPerSqFt,CapacityRank
+MEM,Memphis SuperHub,Memphis,Tennessee,United States,North America,Primary,967,5115929,484000,Memphis-Shelby County Airport Authority,2036,35.0424,-89.9767,1,0.09,1
+IND,Indianapolis Hub,Indianapolis,Indiana,United States,North America,National,449,3229112,164000,Indianapolis Airport Authority,2053,39.7173,-86.2944,2,0.05,2
+MIA,Miami Gateway,Miami,Florida,United States,North America,National,35,284809,7000,"Aero Miami FX, LLC",2041,25.7959,-80.287,3,0.02,15
+AFW,Fort Worth Alliance,Fort Worth,Texas,United States,North America,Regional,168,987388,76000,Fort Worth Alliance Airport Authority,2041,32.9876,-97.3188,4,0.08,4
+EWR,Newark,Newark,New Jersey,United States,North America,Regional,70,634193,156000,Port Authority of NY & NJ,2030,40.6925,-74.1687,5,0.25,3
+OAK,Oakland,Oakland,California,United States,North America,Regional,75,587700,63000,Port of Oakland,2036,37.7213,-122.2207,6,0.11,5
+ORD,Chicago,Chicago,Illinois,United States,North America,Metropolitan,54,481350,21000,City of Chicago,2028,41.9742,-87.9073,7,0.04,12
+LAX,Los Angeles,Los Angeles,California,United States,North America,Metropolitan,34,305300,23000,City of Los Angeles,2025,33.9416,-118.4085,8,0.08,10
+ATL,Atlanta,Atlanta,Georgia,United States,North America,Metropolitan,35,291525,22600,City of Atlanta,2030,33.6407,-84.4277,9,0.08,11
+ANC,Anchorage,Anchorage,Alaska,United States,North America,International,64,417300,25000,State of Alaska DOT&PF,2078,61.1744,-149.9964,10,0.06,9
+CDG,Paris CDG,Roissy,Ile-de-France,France,Europe,International,123,1798368,59000,Aeroports de Paris,2048,49.0097,2.5479,11,0.03,6
+LGG,Liege,Liege,Wallonia,Belgium,Europe,International,23,1027952,33700,Liege Airport,2036,50.6374,5.4432,12,0.03,8
+CGN,Cologne,Cologne,North Rhine-Westphalia,Germany,Europe,International,14,731267,17900,Cologne Bonn Airport,2040,50.8659,7.1427,13,0.02,13
+CAN,Guangzhou,Guangzhou,Guangdong,China,Asia-Pacific,International,155,873006,36000,Guangdong Airport Management Corp.,2029,23.3924,113.2988,14,0.04,7
+KIX,Osaka,Osaka,Kansai,Japan,Asia-Pacific,International,17,425206,9000,Kansai Airports,2029,34.4347,135.244,15,0.02,14

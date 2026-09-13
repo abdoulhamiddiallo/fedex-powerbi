@@ -1,0 +1,32 @@
+table F_AviationIntensity
+	lineageTag: da8b69c1-641f-59e5-9ca6-554316a186ad
+
+	column FiscalYear
+		dataType: int64
+		formatString: 0
+		lineageTag: 19c6ea64-d281-52ec-a46e-b816a0fed7c8
+		summarizeBy: none
+		sourceColumn: FiscalYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column ReductionVs2005Pct
+		dataType: int64
+		formatString: #,0
+		lineageTag: 8d8df2a3-0bae-5c22-952e-ce684a8ef035
+		summarizeBy: none
+		sourceColumn: ReductionVs2005Pct
+
+		annotation SummarizationSetBy = Automatic
+
+	partition F_AviationIntensity = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DossierDonnees & "\F_AviationIntensity.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Types = Table.TransformColumnTypes(Entetes, {{"FiscalYear", Int64.Type}, {"ReductionVs2005Pct", Int64.Type}}, "en-US")
+				in
+				    Types
+
+	annotation PBI_ResultType = Table

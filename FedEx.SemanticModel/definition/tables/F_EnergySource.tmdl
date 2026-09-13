@@ -1,0 +1,59 @@
+table F_EnergySource
+	lineageTag: b999ef2c-7539-5f8f-9fda-5d6d579fb7a3
+
+	column FiscalYear
+		dataType: int64
+		formatString: 0
+		lineageTag: 54b7e2fa-68cc-5dfa-a218-4202132784c4
+		summarizeBy: none
+		sourceColumn: FiscalYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column Source
+		dataType: string
+		lineageTag: ae720e26-1e96-5d0a-af6a-a9dcabb0f129
+		summarizeBy: none
+		sourceColumn: Source
+		sortByColumn: SortOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column Energy
+		dataType: int64
+		formatString: #,0
+		lineageTag: ef323184-dedc-5779-a071-a0804a2df75c
+		summarizeBy: none
+		sourceColumn: Energy
+
+		annotation SummarizationSetBy = Automatic
+
+	column SortOrder
+		dataType: int64
+		isHidden
+		formatString: #,0
+		lineageTag: 41093e44-07ee-5af2-969b-3496536f79d5
+		summarizeBy: none
+		sourceColumn: SortOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column Pillar
+		dataType: string
+		lineageTag: 3b7888ca-4a64-50da-8555-976b789fe174
+		summarizeBy: none
+		sourceColumn: Pillar
+
+		annotation SummarizationSetBy = Automatic
+
+	partition F_EnergySource = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DossierDonnees & "\F_EnergySource.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Types = Table.TransformColumnTypes(Entetes, {{"FiscalYear", Int64.Type}, {"Source", type text}, {"Energy", Int64.Type}, {"SortOrder", Int64.Type}, {"Pillar", type text}}, "en-US")
+				in
+				    Types
+
+	annotation PBI_ResultType = Table

@@ -1,0 +1,131 @@
+table F_Energy
+	lineageTag: 5e4576de-3c3a-53d8-a6ad-b4dc201973eb
+
+	column FiscalYear
+		dataType: int64
+		formatString: 0
+		lineageTag: 4645748e-263e-5631-bef5-d3a3a3e28af1
+		summarizeBy: none
+		sourceColumn: FiscalYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column JetFuel
+		dataType: int64
+		formatString: #,0
+		lineageTag: ffed3593-6aee-5d9d-989e-295d85c7c06a
+		summarizeBy: none
+		sourceColumn: JetFuel
+
+		annotation SummarizationSetBy = Automatic
+
+	column Diesel
+		dataType: int64
+		formatString: #,0
+		lineageTag: 8105a995-37c4-54ed-971f-243c5dfd4d8b
+		summarizeBy: none
+		sourceColumn: Diesel
+
+		annotation SummarizationSetBy = Automatic
+
+	column Petrol
+		dataType: int64
+		formatString: #,0
+		lineageTag: 1bfe180f-773a-50d3-b44e-5713095d2df0
+		summarizeBy: none
+		sourceColumn: Petrol
+
+		annotation SummarizationSetBy = Automatic
+
+	column LPG
+		dataType: int64
+		formatString: #,0
+		lineageTag: 899e6526-d302-5265-83bb-611b665de3cd
+		summarizeBy: none
+		sourceColumn: LPG
+
+		annotation SummarizationSetBy = Automatic
+
+	column GasNGV
+		dataType: int64
+		formatString: #,0
+		lineageTag: 8f1ae9a4-8d3d-55cf-933a-70b59dd4b272
+		summarizeBy: none
+		sourceColumn: GasNGV
+
+		annotation SummarizationSetBy = Automatic
+
+	column Biodiesel
+		dataType: int64
+		formatString: #,0
+		lineageTag: 9a911896-37d3-5563-be0a-e7f933e74c99
+		summarizeBy: none
+		sourceColumn: Biodiesel
+
+		annotation SummarizationSetBy = Automatic
+
+	column VehicleFuel
+		dataType: int64
+		formatString: #,0
+		lineageTag: 46475356-f3df-5e49-9244-25b9eb087c6c
+		summarizeBy: none
+		sourceColumn: VehicleFuel
+
+		annotation SummarizationSetBy = Automatic
+
+	column Electricity
+		dataType: int64
+		formatString: #,0
+		lineageTag: bb5f8214-4c14-5a5d-990d-02bc81725dd6
+		summarizeBy: none
+		sourceColumn: Electricity
+
+		annotation SummarizationSetBy = Automatic
+
+	column TotalEnergy
+		dataType: int64
+		formatString: #,0
+		lineageTag: 40f149cb-3365-502b-ad02-e021462d50b3
+		summarizeBy: none
+		sourceColumn: TotalEnergy
+
+		annotation SummarizationSetBy = Automatic
+
+	column TotalInclScope3
+		dataType: int64
+		formatString: #,0
+		lineageTag: 82f20272-201b-5173-aee6-d5f64ad3d1e6
+		summarizeBy: none
+		sourceColumn: TotalInclScope3
+
+		annotation SummarizationSetBy = Automatic
+
+	column IntensityTJperMn
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 79375f06-85f4-5831-b694-319172360b8b
+		summarizeBy: none
+		sourceColumn: IntensityTJperMn
+
+		annotation SummarizationSetBy = Automatic
+
+	column JetSharePct
+		dataType: double
+		formatString: #,0.0
+		lineageTag: 6f1277ec-04ee-593d-9dcf-bf9b7a0b2abf
+		summarizeBy: none
+		sourceColumn: JetSharePct
+
+		annotation SummarizationSetBy = Automatic
+
+	partition F_Energy = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DossierDonnees & "\F_Energy.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Types = Table.TransformColumnTypes(Entetes, {{"FiscalYear", Int64.Type}, {"JetFuel", Int64.Type}, {"Diesel", Int64.Type}, {"Petrol", Int64.Type}, {"LPG", Int64.Type}, {"GasNGV", Int64.Type}, {"Biodiesel", Int64.Type}, {"VehicleFuel", Int64.Type}, {"Electricity", Int64.Type}, {"TotalEnergy", Int64.Type}, {"TotalInclScope3", Int64.Type}, {"IntensityTJperMn", type number}, {"JetSharePct", type number}}, "en-US")
+				in
+				    Types
+
+	annotation PBI_ResultType = Table

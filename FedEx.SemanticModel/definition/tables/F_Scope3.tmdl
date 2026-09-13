@@ -1,0 +1,42 @@
+table F_Scope3
+	lineageTag: 762cb36c-ccb2-5fb4-a05c-c3c3d7104ff8
+
+	column Category
+		dataType: string
+		lineageTag: 2cb726be-6171-51e9-bff9-5aa72691140e
+		summarizeBy: none
+		sourceColumn: Category
+		sortByColumn: SortOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column Emissions
+		dataType: int64
+		formatString: #,0
+		lineageTag: ac246844-df44-58b3-b0bd-ad5b6be945a6
+		summarizeBy: none
+		sourceColumn: Emissions
+
+		annotation SummarizationSetBy = Automatic
+
+	column SortOrder
+		dataType: int64
+		isHidden
+		formatString: #,0
+		lineageTag: 7634763d-721c-5fa5-adb8-b9da4bb3ccb9
+		summarizeBy: none
+		sourceColumn: SortOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	partition F_Scope3 = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DossierDonnees & "\F_Scope3.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Types = Table.TransformColumnTypes(Entetes, {{"Category", type text}, {"Emissions", Int64.Type}, {"SortOrder", Int64.Type}}, "en-US")
+				in
+				    Types
+
+	annotation PBI_ResultType = Table

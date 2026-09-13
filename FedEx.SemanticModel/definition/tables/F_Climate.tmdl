@@ -1,0 +1,75 @@
+table F_Climate
+	lineageTag: 266a12d4-5908-5b1b-a5c5-a81876f52478
+
+	column FiscalYear
+		dataType: int64
+		formatString: 0
+		lineageTag: cbe9b833-237a-5d59-870f-c9be17a337d0
+		summarizeBy: none
+		sourceColumn: FiscalYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column Scope1
+		dataType: int64
+		formatString: #,0
+		lineageTag: d5560100-6371-5054-9a84-8984173ef952
+		summarizeBy: none
+		sourceColumn: Scope1
+
+		annotation SummarizationSetBy = Automatic
+
+	column Scope2
+		dataType: int64
+		formatString: #,0
+		lineageTag: a916d6d8-ebd1-5eb7-a078-300707b4e309
+		summarizeBy: none
+		sourceColumn: Scope2
+
+		annotation SummarizationSetBy = Automatic
+
+	column Scope1and2
+		dataType: int64
+		formatString: #,0
+		lineageTag: f03ea792-2304-58ec-9dca-9190acd17c54
+		summarizeBy: none
+		sourceColumn: Scope1and2
+
+		annotation SummarizationSetBy = Automatic
+
+	column IntensityPerRevenueMn
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 67215d59-9f5e-5270-ac62-3e6dfadc5c5d
+		summarizeBy: none
+		sourceColumn: IntensityPerRevenueMn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Scope2Basis
+		dataType: string
+		lineageTag: 6df186bd-bcd2-5f3e-b572-634f8e231930
+		summarizeBy: none
+		sourceColumn: Scope2Basis
+
+		annotation SummarizationSetBy = Automatic
+
+	column DataStatus
+		dataType: string
+		lineageTag: 696bd8ad-ecb8-59ef-b461-fa0b43f390ec
+		summarizeBy: none
+		sourceColumn: DataStatus
+
+		annotation SummarizationSetBy = Automatic
+
+	partition F_Climate = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DossierDonnees & "\F_Climate.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Types = Table.TransformColumnTypes(Entetes, {{"FiscalYear", Int64.Type}, {"Scope1", Int64.Type}, {"Scope2", Int64.Type}, {"Scope1and2", Int64.Type}, {"IntensityPerRevenueMn", type number}, {"Scope2Basis", type text}, {"DataStatus", type text}}, "en-US")
+				in
+				    Types
+
+	annotation PBI_ResultType = Table

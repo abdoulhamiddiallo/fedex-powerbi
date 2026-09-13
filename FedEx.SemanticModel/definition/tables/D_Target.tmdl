@@ -1,0 +1,58 @@
+table D_Target
+	lineageTag: 5e8c90ca-b851-5344-aaeb-98068a29299a
+
+	column Target
+		dataType: string
+		lineageTag: a4026c7a-2f04-5c64-8a26-228874969f1f
+		summarizeBy: none
+		sourceColumn: Target
+		sortByColumn: SortOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column Due
+		dataType: int64
+		formatString: 0
+		lineageTag: 317d6b46-8a2a-53fb-9795-42bce0f0967b
+		summarizeBy: none
+		sourceColumn: TargetYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column Commitment
+		dataType: string
+		lineageTag: 54f64496-957c-50d1-bf1c-b687219a935c
+		summarizeBy: none
+		sourceColumn: Detail
+
+		annotation SummarizationSetBy = Automatic
+
+	column Pillar
+		dataType: string
+		lineageTag: 3d8b85ac-2a08-5eb7-b0a0-49a06033fd96
+		summarizeBy: none
+		sourceColumn: Pillar
+
+		annotation SummarizationSetBy = Automatic
+
+	column SortOrder
+		dataType: int64
+		isHidden
+		formatString: #,0
+		lineageTag: 93a609de-9b5d-566a-b265-c5fa41fbca9b
+		summarizeBy: none
+		sourceColumn: SortOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	partition D_Target = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DossierDonnees & "\D_Target.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Types = Table.TransformColumnTypes(Entetes, {{"Target", type text}, {"TargetYear", Int64.Type}, {"Detail", type text}, {"Pillar", type text}, {"SortOrder", Int64.Type}}, "en-US")
+				in
+				    Types
+
+	annotation PBI_ResultType = Table

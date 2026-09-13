@@ -1,0 +1,58 @@
+table F_Segment
+	lineageTag: 411be195-7636-50db-8d67-fdb61966d450
+
+	column FiscalYear
+		dataType: int64
+		formatString: 0
+		lineageTag: 82334fc5-647a-59ba-b9b5-c0c685063189
+		summarizeBy: none
+		sourceColumn: FiscalYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column Segment
+		dataType: string
+		lineageTag: ea525943-c77b-5b6b-9b14-b7648074bd58
+		summarizeBy: none
+		sourceColumn: Segment
+
+		annotation SummarizationSetBy = Automatic
+
+	column Revenue
+		dataType: int64
+		formatString: #,0
+		lineageTag: d5385ebb-f7ba-525a-a311-42c24de7546d
+		summarizeBy: none
+		sourceColumn: Revenue
+
+		annotation SummarizationSetBy = Automatic
+
+	column OperatingIncome
+		dataType: int64
+		formatString: #,0
+		lineageTag: 059c0640-ce6d-5e8a-bc24-d8ff36221817
+		summarizeBy: none
+		sourceColumn: OperatingIncome
+
+		annotation SummarizationSetBy = Automatic
+
+	column OperatingMarginPct
+		dataType: double
+		formatString: #,0.00
+		lineageTag: dd7809e1-84ba-570f-ba7c-f89b7965777c
+		summarizeBy: none
+		sourceColumn: OperatingMarginPct
+
+		annotation SummarizationSetBy = Automatic
+
+	partition F_Segment = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DossierDonnees & "\F_Segment.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Types = Table.TransformColumnTypes(Entetes, {{"FiscalYear", Int64.Type}, {"Segment", type text}, {"Revenue", Int64.Type}, {"OperatingIncome", Int64.Type}, {"OperatingMarginPct", type number}}, "en-US")
+				in
+				    Types
+
+	annotation PBI_ResultType = Table

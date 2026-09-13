@@ -1,0 +1,77 @@
+table F_Efficiency
+	lineageTag: 908ce921-a74e-5868-a7a0-0df10c95ac1e
+
+	column FiscalYear
+		dataType: int64
+		formatString: 0
+		lineageTag: 04ab61fd-f3c1-5e6e-a204-25ca0813dc1c
+		summarizeBy: none
+		sourceColumn: FiscalYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column AviationLperATM
+		dataType: double
+		formatString: #,0.0000
+		lineageTag: 9e1b5536-45dd-5a35-bea0-b9f1971d01d8
+		summarizeBy: none
+		sourceColumn: AviationLperATM
+
+		annotation SummarizationSetBy = Automatic
+
+	column AvailableTonMiles
+		dataType: int64
+		formatString: #,0
+		lineageTag: 1d5b4493-4738-5132-aa91-d060708c5a9e
+		summarizeBy: none
+		sourceColumn: AvailableTonMiles
+
+		annotation SummarizationSetBy = Automatic
+
+	column AviationLitres
+		dataType: int64
+		formatString: #,0
+		lineageTag: 8e635535-540f-58f6-9553-88872af7dd98
+		summarizeBy: none
+		sourceColumn: AviationLitres
+
+		annotation SummarizationSetBy = Automatic
+
+	column HDVLperMile
+		dataType: double
+		formatString: #,0.0000
+		lineageTag: 9b264959-1104-5305-ad5f-8a64bfc02636
+		summarizeBy: none
+		sourceColumn: HDVLperMile
+
+		annotation SummarizationSetBy = Automatic
+
+	column HDVMiles
+		dataType: int64
+		formatString: #,0
+		lineageTag: 7354a972-5758-5e3b-b43a-6a17abff223d
+		summarizeBy: none
+		sourceColumn: HDVMiles
+
+		annotation SummarizationSetBy = Automatic
+
+	column HDVLitres
+		dataType: int64
+		formatString: #,0
+		lineageTag: 804018ea-cea5-5923-ac83-a0e88ce3cbb4
+		summarizeBy: none
+		sourceColumn: HDVLitres
+
+		annotation SummarizationSetBy = Automatic
+
+	partition F_Efficiency = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DossierDonnees & "\F_Efficiency.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Entetes = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Types = Table.TransformColumnTypes(Entetes, {{"FiscalYear", Int64.Type}, {"AviationLperATM", type number}, {"AvailableTonMiles", Int64.Type}, {"AviationLitres", Int64.Type}, {"HDVLperMile", type number}, {"HDVMiles", Int64.Type}, {"HDVLitres", Int64.Type}}, "en-US")
+				in
+				    Types
+
+	annotation PBI_ResultType = Table
