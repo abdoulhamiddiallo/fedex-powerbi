@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
-"""gen_report : construction des pages PBIR du rapport MERIDIAN."""
+"""gen_report: builds the PBIR pages of the MERIDIAN report."""
 import os, shutil, csv, math, re, json
 import brand
 from pbir_lib import *
 from pbir_lib import _accent_png
 import pbir_lib as L
 
-# bornes de la projection du planisphere : partagees par le PNG et la couche cliquable
+# bounds of the planisphere projection: shared by the PNG and the clickable layer
 MAP_BOUNDS = (-170, 158, -46, 76)
-MAP_A = 928          # largeur du panneau carte
-MAP_TOP = 82                    # bandeau reserve au titre, au-dessus de l'image
-MAP_W, MAP_H = MAP_A - 4, 536 - MAP_TOP - 2   # le PNG fait la taille exacte de son cadre
+MAP_A = 928          # width of the map panel
+MAP_TOP = 82                    # band reserved for the title, above the image
+MAP_W, MAP_H = MAP_A - 4, 536 - MAP_TOP - 2   # the PNG is exactly the size of its frame
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 REP  = os.path.join(ROOT, 'FedEx.Report')
@@ -37,15 +37,15 @@ EYEBROW = 'FEDEX CORPORATION  ·  FY2026'
 FOOT = ('Source: FedEx Form 10-K FY2026 and FY2025 (SEC), Statistical Book Q4 FY2026, Corporate Responsibility '
         'Reports. Fiscal year ends 31 May. Independent analysis of public filings.')
 
-# ─────────────────────────── ossature de page ───────────────────────────
+# ─────────────────────────── page skeleton ───────────────────────────
 _FREG = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
 
 def slicer_width(ref, flag=None, size=13):
-    """Largeur d'un segment en tuiles.
+    """Width of a slicer in tile mode.
 
-    Power BI donne la meme largeur a toutes les tuiles : c'est donc la valeur la plus
-    longue qui commande. On la mesure et on ajoute la marge interne, pour qu'aucun
-    libelle ne soit jamais coupe en 'Internatio...'."""
+    Power BI gives every tile the same width, so the longest value is the one that
+    rules. We measure it and add the inner padding, so that no label is ever cut
+    down to 'Internatio...'."""
     from PIL import ImageFont
     ent, col, _ = L.parse(ref)
     tbl = {'D_FiscalYear': 'D_FiscalYear', 'D_Hub': 'D_Hub', 'F_Network': 'F_Network'}[ent]
@@ -63,7 +63,7 @@ def slicer_width(ref, flag=None, size=13):
 _FBOLD = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
 
 def _tw(txt, size):
-    """Largeur en pixels d'un titre, mesuree avec la meme metrique que le controle."""
+    """Width in pixels of a title, measured with the same metric as the quality gate."""
     from PIL import ImageFont
     return ImageFont.truetype(_FBOLD, int(size)).getlength(txt)
 
@@ -71,10 +71,10 @@ _COLSRC = None
 _RENDERED = None
 
 def _rendered():
-    """Valeurs affichees par Power BI, relevees en DAX sur le modele ouvert.
+    """Values as Power BI displays them, read in DAX from the open model.
 
-    C'est le seul moyen de connaitre la largeur reelle d'une colonne de mesure :
-    « 56 owned · 3 leased » ou « 19,319,200 » ne sont dans aucun CSV."""
+    This is the only way to know the real width of a measure column: strings like
+    '56 owned / 3 leased' or '19,319,200' appear in no CSV."""
     global _RENDERED
     if _RENDERED is None:
         f = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'rendered_values.json')
@@ -84,7 +84,7 @@ def _rendered():
 
 
 def _colsrc():
-    """Nom affiche -> colonne du CSV, lu dans le TMDL deja genere."""
+    """Display name -> CSV column, read from the TMDL already generated."""
     global _COLSRC
     if _COLSRC is None:
         _COLSRC = {}
@@ -101,12 +101,11 @@ def _colsrc():
     return _COLSRC
 
 def fitw(cols, widths, w, size=13, hdrsize=13, sort=None):
-    """Elargit toute colonne trop etroite pour son en-tete ou sa plus longue valeur.
+    """Widens any column too narrow for its header or its longest value.
 
-    Les largeurs passees restent des minimums : on ne retrecit jamais une colonne qui
-    marche deja (les valeurs de mesure ne sont pas mesurables ici), on ne fait que
-    donner sa place a ce qui serait coupe. C'est le controle que l'utilisateur a du
-    faire a ma place trois fois de suite."""
+    The widths passed in stay minimums: a column that already works is never
+    shrunk (measure values cannot be measured here), we only give room to what
+    would otherwise be cut."""
     from PIL import ImageFont
     fh = ImageFont.truetype(_FBOLD, int(round(hdrsize * 1.33)))
     ft = ImageFont.truetype(_FREG, int(round(size * 1.33)))
@@ -117,9 +116,9 @@ def fitw(cols, widths, w, size=13, hdrsize=13, sort=None):
         ent, prop, meas = L.parse(ref)
         need = fh.getlength(prop) + (18 if sort and sort.endswith('.' + prop) else 0)
         vals = []
-        # 1) valeurs telles que Power BI les affiche, relevees en DAX (mesures comprises)
+        # 1) values as Power BI displays them, read in DAX (measures included)
         vals += rend.get(f'{ent}.{prop}', [])
-        # 2) a defaut, le texte brut du CSV
+        # 2) failing that, the raw CSV text
         if not vals and not meas:
             key = src.get((ent, prop), prop)
             path = os.path.join(ROOT, 'Donnees', ent + '.csv')
@@ -129,11 +128,11 @@ def fitw(cols, widths, w, size=13, hdrsize=13, sort=None):
         if vals:
             need = max(need, max(ft.getlength(v) for v in vals))
         elif meas:
-            warn(f'colonne de mesure non relevee : {ref} (largeur non garantie)')
+            warn(f'measure column not read: {ref} (width not guaranteed)')
         out.append(int(math.ceil(max(cur, need + 22))))
     lim = w - 45
     if sum(out) > lim:
-        warn(f'tableau {cols[0]} : {sum(out)} px necessaires pour {lim} px disponibles')
+        warn(f'table {cols[0]}: {sum(out)} px needed for {lim} px available')
     return out
 
 L.FITW = fitw
@@ -156,7 +155,7 @@ def frame(pg, active, title, subtitle, filt=None, flabel=None, fwidth=660, singl
     text(pg, 0, H - 46, RAIL_W, 28, [(TITLE, 13, MUTED, FD)], 'center')
 
     fx = (X1 - 190 - fwidth) if filt else None
-    # largeur reellement disponible pour le titre : on s'arrete avant le filtre
+    # width actually available for the title: stop before the filter
     tw = (fx - 20 - X0) if filt else 900
     tsize = 31
     while tsize > 26 and _tw(title.upper(), tsize * 1.33) > tw:
@@ -176,15 +175,15 @@ def row(n, gap=16, x0=X0, w=CW):
     return [(x0 + i * (ww + gap), ww) for i in range(n)]
 
 KPIY, KPIH = 112, 202
-CY, CH = 328, 536            # zone de contenu
+CY, CH = 328, 536            # content area
 HALF = (CH - 16) // 2        # 260
-TOPH = HALF                  # bloc haut quand il porte un tableau
+TOPH = HALF                  # top block when it carries a table
 BOTH = CH - 16 - TOPH        # 236
 
 def kpirow(pg, items, y=KPIY, h=KPIH, vs=None):
     cols = row(len(items))
-    # les tuiles a six colonnes sont plus etroites, mais le texte reste lisible :
-    # c'est le controle des cartes qui dira si une ligne de contexte ne rentre plus
+    # six-column tiles are narrower, but the text stays legible:
+    # the card check will tell us if a context line no longer fits
     ls = 12 if len(items) >= 6 else 13
     cs = 12 if len(items) >= 6 else 13
     vs = vs or (34 if len(items) >= 6 else 38)
@@ -195,7 +194,7 @@ def kpirow(pg, items, y=KPIY, h=KPIH, vs=None):
             units=it.get('units', 1), prec=it.get('prec'),
             icon='ki_%s.png' % it['icon'] if it.get('icon') else None)
 
-# ═══════════════════════════ P1 : NETWORK PULSE ═══════════════════════════
+# ═══════════════════════════ P1: NETWORK PULSE ═══════════════════════════
 def page1():
     pg = Page('p1', 'Network Pulse')
     frame(pg, 'p1', 'Network Pulse',
@@ -213,11 +212,11 @@ def page1():
     a = MAP_A
     b = CW - a - 16
     panel(pg, X0, CY, a, CH)
-    # Le titre a desormais son propre bandeau : l'image commence en dessous, si bien
-    # qu'aucune etiquette de hub ne peut plus se retrouver sous le sous-titre.
+    # The title now has its own band: the image starts below it, so that no hub
+    # label can end up underneath the subtitle any more.
     my = CY + MAP_TOP
     image(pg, X0 + 2, my, a - 4, MAP_H, 'network_map.png', 'Fill')
-    # couche vivante : memes bornes que la projection du PNG, donc les hubs tombent juste
+    # live layer: same bounds as the PNG projection, so the hubs land exactly right
     mapscatter(pg, X0 + 2, my, a - 4, MAP_H,
                '#D_Hub.Hub', '#D_Hub.Longitude', '#D_Hub.Latitude',
                size='Metrics.Sort capacity', bounds=MAP_BOUNDS, bubble=-52, labels=False,
@@ -230,8 +229,8 @@ def page1():
     table(pg, X0 + a + 16, CY, b, TOPH,
           ['#D_Hub.Hub', 'Metrics.Sort capacity', 'Metrics.Share'],
           [174, 166, 84],
-          # pas de sous-titre ici : les 26 px qu'il coutait sont ceux qui manquaient au
-          # graphique du dessous pour afficher sa sixieme ligne de service
+          # no subtitle here: the 26 px it cost are exactly what the chart below was
+          # missing to display its sixth service line
           title='THE FIVE BIGGEST HUBS',
           sort='Metrics.Sort capacity', rows=5,
           vfilter=('#D_Hub.CapacityRank', 4, 5),
@@ -243,7 +242,7 @@ def page1():
         tips=['Metrics.Service revenue', 'Metrics.Reported yield', '#F_Service.ServiceGroup'])
     return pg
 
-# ═══════════════════════════ P2 : AIR FLEET ═══════════════════════════
+# ═══════════════════════════ P2: AIR FLEET ═══════════════════════════
 AC_ART = [('B777F · 767F · A300-600', 'wide2', 'ac_wide2.png'),
           ('MD-11 trijet', 'wide3', 'ac_wide3.png'),
           ('757-200', 'narrow', 'ac_narrow.png'),
@@ -293,7 +292,7 @@ def page2():
         legend=True, dlabels=False, valax=True, catcategorical=True, palette=[ORANGE, ROSE])
     return pg
 
-# ═══════════════════════════ P3 : HUBS ═══════════════════════════
+# ═══════════════════════════ P3: HUBS ═══════════════════════════
 def page3():
     pg = Page('p3', 'Hubs')
     frame(pg, 'p3', 'Hubs and Facilities',
@@ -310,9 +309,9 @@ def page3():
         dict(label='Airports served', ref='Metrics.Airports served', ctx='Metrics.Airports context',
              icon='tower'),
     ])
-    # « Tier » sortait deux fois de la page : c'est deja le segment en haut et le
-    # decoupage de l'anneau. En le retirant, les lignes passent en 13pt et l'anneau
-    # recupere la largeur dont ses cinq etiquettes avaient besoin.
+    # 'Tier' appeared twice on the page: it is already the segment at the top and the
+    # split of the ring. Removing it lets the rows go to 13pt and gives the ring back
+    # the width its five labels needed.
     a = 860
     b = CW - a - 16
     table(pg, X0, CY, a, CH,
@@ -323,9 +322,9 @@ def page3():
           sub='Hourly capacity, floor area, land, and the year each lease runs to',
           sort='Metrics.Sort capacity', size=13, hdrsize=13, rows=15,
           tips=['#D_Hub.City', '#D_Hub.Continent', '#D_Hub.Lessor', '#D_Hub.PiecesPerSqFt'])
-    # le tableau de gauche classe deja les quinze hubs par capacite : un « top six »
-    # ferait doublon. On donne la place a l'anneau, qui manquait d'air pour ses
-    # etiquettes, et a une lecture geographique que la page n'avait pas.
+    # the left-hand table already ranks the fifteen hubs by capacity: a 'top six'
+    # would duplicate it. The space goes to the ring, which lacked room for its
+    # labels, and to a geographic reading the page did not have.
     dh, bh2 = 292, CH - 292 - 16
     donut(pg, X0 + a + 16, CY, b, dh, '#D_Hub.Tier', 'Metrics.Sort capacity',
           title='CAPACITY BY TIER',
@@ -337,7 +336,7 @@ def page3():
         sort='Metrics.Footprint Msqft', fill=VIOLET, dlabels=True, prec=1)
     return pg
 
-# ═══════════════════════════ P4 : GROUND ═══════════════════════════
+# ═══════════════════════════ P4: GROUND ═══════════════════════════
 def page4():
     pg = Page('p4', 'Ground')
     frame(pg, 'p4', 'Ground Network',
@@ -375,7 +374,7 @@ def page4():
         fill=VIOLET, catcategorical=True)
     return pg
 
-# ═══════════════════════════ P5 : CLIMATE ═══════════════════════════
+# ═══════════════════════════ P5: CLIMATE ═══════════════════════════
 def page5():
     pg = Page('p5', 'Climate')
     frame(pg, 'p5', 'Climate and Fuel',
@@ -412,7 +411,7 @@ def page5():
           tips=['#D_Target.Pillar', 'Metrics.Years to target'])
     return pg
 
-# ═══════════════════════════ P6 : FINANCIALS ═══════════════════════════
+# ═══════════════════════════ P6: FINANCIALS ═══════════════════════════
 def page6():
     pg = Page('p6', 'Financials')
     frame(pg, 'p6', 'Financials',
@@ -457,7 +456,7 @@ def page6():
          vfilter=('Metrics.Operating margin', 1, 0))
     return pg
 
-# ═══════════════════════════ P7 : ENERGY ═══════════════════════════
+# ═══════════════════════════ P7: ENERGY ═══════════════════════════
 def page7():
     pg = Page('p7', 'Energy')
     frame(pg, 'p7', 'Energy and Consumption',
@@ -480,7 +479,7 @@ def page7():
     ], vs=32)
     a = 892
     b = CW - a - 16
-    eh = 300                      # la colonne empilee porte une legende : il lui faut de l'air
+    eh = 300                      # the stacked column carries a legend: it needs room
     stackcol(pg, X0, CY, a, eh, '#D_FiscalYear.FiscalYearShort', ['Metrics.Energy by year'],
              series='#F_EnergySource.Source',
              title='WHERE THE ENERGY GOES',
@@ -501,7 +500,7 @@ def page7():
           tips=['Metrics.Total energy'])
     return pg
 
-# ═══════════════════════════ thème ═══════════════════════════
+# ═══════════════════════════ theme ═══════════════════════════
 def theme():
     return {
         "name": THEME,
@@ -528,7 +527,7 @@ def theme():
         }}},
     }
 
-# ═══════════════════════════ ressources ═══════════════════════════
+# ═══════════════════════════ assets ═══════════════════════════
 def resources():
     import csv
     brand.OUT = RES
@@ -544,20 +543,20 @@ def resources():
     for lab, kind, png in AC_ART:
         brand.save(brand.aircraft(kind, 132, 132), png)
         names.append(png)
-    # carte du réseau
+    # network map
     rows = list(csv.DictReader(open(os.path.join(ROOT, 'Donnees', 'D_Hub.csv'), encoding='utf-8')))
     hubs = [(r['Hub'], float(r['Latitude']), float(r['Longitude']),
              float(r['SortCapacityHr']), r['HubClass']) for r in rows]
     brand.save(brand.network_map(hubs, MAP_W, MAP_H, *MAP_BOUNDS, bubbles=False), 'network_map.png')
     names.append('network_map.png')
-    # pictogrammes de KPI
+    # KPI pictograms
     for k in ('plane', 'parcel', 'dollar', 'globe', 'people', 'weight', 'scale', 'factory', 'key',
               'order', 'warehouse', 'sort', 'area', 'land', 'tower', 'truck', 'plug', 'building',
               'pallet', 'cloud', 'gauge', 'chain', 'fuel', 'chart', 'percent', 'coin', 'share', 'bolt',
               'invest'):
         brand.save(brand.kpi_icon(k, 96, (255, 255, 255)), f'ki_{k}.png')
         names.append(f'ki_{k}.png')
-    # logo fourni par l'utilisateur
+    # logo supplied by the user
     if not os.path.exists(LOGO_SRC):
         raise SystemExit(f'missing brand asset: {LOGO_SRC}')
     if True:
@@ -589,7 +588,7 @@ def build():
                    "artifacts": [{"report": {"path": "FedEx.Report"}}],
                    "settings": {"enableAutoRecovery": True}}, f, indent=2)
     nv = sum(len(p.visuals) for p in pages)
-    print(f'{len(pages)} pages, {nv} visuels, {len(names)} ressources')
+    print(f'{len(pages)} pages, {nv} visuals, {len(names)} assets')
     for wmsg in warnings():
         print('  !! ' + wmsg)
     return pages

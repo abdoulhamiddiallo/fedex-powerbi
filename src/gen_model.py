@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""gen_model : écriture du dossier .SemanticModel (TMDL) du projet MERIDIAN."""
+"""gen_model: writes the .SemanticModel (TMDL) folder of the MERIDIAN project."""
 import csv, os, uuid, shutil
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
@@ -10,7 +10,7 @@ NS   = uuid.UUID('8f1c2c5e-0d4a-4a71-9b7e-6f3c1d2e4a55')
 def lt(*k):
     return str(uuid.uuid5(NS, '|'.join(map(str, k))))
 
-# type -> (dataType TMDL, type M, formatString par défaut)
+# type -> (TMDL dataType, M type, default formatString)
 T = {
     'int':  ('int64',  'Int64.Type',   '#,0'),
     'num':  ('double', 'type number',  '#,0.00'),
@@ -20,7 +20,7 @@ T = {
 class Table:
     def __init__(self, name, cols, hidden=None, sortby=None, fmt=None):
         self.name = name
-        self.cols = cols                 # [(colonne, type, source_csv_ou_None)]
+        self.cols = cols                 # [(column, type, csv_source_or_None)]
         self.hidden = set(hidden or [])
         self.sortby = sortby or {}
         self.fmt = fmt or {}
@@ -191,8 +191,8 @@ RELATIONS = [
  ('F_EnergySource', 'FiscalYear', 'D_FiscalYear', 'FiscalYear'),
 ]
 
-# ─────────────────────────── mesures ───────────────────────────
-# (nom, expression DAX, formatString, dossier, description)
+# ─────────────────────────── measures ───────────────────────────
+# (name, DAX expression, formatString, folder, description)
 M = []
 def m(name, expr, fmt='#,0', folder='', desc=None):
     M.append((name, ' '.join(expr.split()) if '\n' not in expr else expr, fmt, folder, desc))
@@ -206,7 +206,7 @@ F_VOL   = '06 Volumes & yield'
 F_CLI   = '07 Climate'
 F_TXT   = '08 Narrative'
 
-# flotte
+# fleet
 m('Aircraft', 'VAR y = MAX ( F_Fleet[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Fleet[Aircraft] ), F_Fleet[FiscalYear] = y )', '#,0', F_FLEET, 'Aircraft in the fleet at the close of the fiscal year in context.')
 m('Aircraft LY', 'CALCULATE ( [Aircraft], D_FiscalYear[FiscalYear] = MAX ( F_Fleet[FiscalYear] ) - 1 )', '#,0', F_FLEET)
 m('Aircraft change', '[Aircraft] - [Aircraft LY]', '+#,0;-#,0;0', F_FLEET)
@@ -226,7 +226,7 @@ m('Boeing share', 'DIVIDE ( CALCULATE ( [Aircraft], D_Aircraft[IsBoeing] = 1, RE
   '0.0%', F_MIX, 'Share of the total fleet built by Boeing, including the MD-11 trijet.')
 m('Manufacturer share', 'DIVIDE ( [Aircraft], [Fleet total] )', '0.0%', F_MIX)
 
-# charge utile
+# payload
 m('Fleet payload lbs', 'VAR y = MAX ( F_Fleet[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Fleet[PayloadLbs] ), F_Fleet[FiscalYear] = y )', '#,0', F_PAY,
   'Sum of maximum gross structural payload across every aircraft in the fleet.')
 m('Fleet payload Mlbs', 'DIVIDE ( [Fleet payload lbs], 1000000 )', '#,0.0', F_PAY)
@@ -244,7 +244,7 @@ m('Trunk payload share',
   '0.0%', F_PAY)
 m('Payload per aircraft type', 'AVERAGE ( D_Aircraft[Payload] )', '#,0', F_PAY)
 
-# plan de flotte
+# fleet plan
 m('Deliveries', 'SUM ( F_FleetPlan[Deliveries] )', '#,0', F_FLEET)
 m('Retirements', 'SUM ( F_FleetPlan[Retirements] )', '#,0', F_FLEET)
 m('Net fleet change', 'SUM ( F_FleetPlan[NetChange] )', '+#,0;-#,0;0', F_FLEET)
@@ -272,7 +272,7 @@ m('vs FY23',
   'RETURN n - b', '+#,0;-#,0;0', F_FLEET, 'Change in the number of aircraft of each type between FY2023 and FY2026.')
 m('Hub rank', 'RANKX ( ALL ( D_Hub[Hub] ), [Sort capacity],, DESC )', '0', F_HUB)
 
-# réseau
+# network
 def net(label, ind, fmt='#,0'):
     m(label, f'CALCULATE ( SUM ( F_Network[Value] ), F_Network[Indicator] = "{ind}" )', fmt, F_HUB)
 net('Countries served', 'Countries & territories served')
@@ -289,7 +289,7 @@ net('City stations', 'International city stations')
 m('Retail points', '[Retail points US] + [Retail points intl] + [Drop boxes]', '#,0', F_HUB)
 m('Reported figure', 'SUM ( F_Network[Value] )', '#,0', F_HUB)
 
-# effectifs
+# headcount
 m('Employees', 'CALCULATE ( SUM ( F_People[Total] ), F_People[FiscalYear] = MAX ( F_People[FiscalYear] ) )', '#,0', F_HUB)
 m('Full-time employees', 'CALCULATE ( SUM ( F_People[FullTime] ), F_People[FiscalYear] = MAX ( F_People[FiscalYear] ) )', '#,0', F_HUB)
 m('Part-time employees', 'CALCULATE ( SUM ( F_People[PartTime] ), F_People[FiscalYear] = MAX ( F_People[FiscalYear] ) )', '#,0', F_HUB)
@@ -327,7 +327,7 @@ m('LTL revenue per shipment', 'CALCULATE ( AVERAGE ( F_Freight[RevenuePerShipmen
 m('LTL shipments series', 'SUM ( F_Freight[ShipmentsPerDay] )', '#,0', F_VOL)
 m('LTL yield series', 'AVERAGE ( F_Freight[RevenuePerShipment] )', '$#,0.00', F_VOL)
 
-# climat
+# climate
 m('Scope 1', 'VAR y = MAX ( F_Climate[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Climate[Scope1] ), F_Climate[FiscalYear] = y )', '#,0', F_CLI, 'Direct greenhouse gas emissions, metric tons CO2e.')
 m('Scope 2', 'VAR y = MAX ( F_Climate[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Climate[Scope2] ), F_Climate[FiscalYear] = y )', '#,0', F_CLI)
 m('Scope 1 and 2', 'VAR y = MAX ( F_Climate[FiscalYear] ) RETURN CALCULATE ( SUM ( F_Climate[Scope1and2] ), F_Climate[FiscalYear] = y )', '#,0', F_CLI)
@@ -354,7 +354,7 @@ m('SAF series', 'SUM ( F_SAF[SAFMnGal] )', '#,0.0', F_CLI)
 m('Target year', 'MIN ( D_Target[Due] )', '0', F_CLI)
 m('Years to target', 'MIN ( D_Target[Due] ) - 2026', '#,0', F_CLI)
 
-# textes de contexte des tuiles
+# tile context texts
 def txt(name, expr, folder=F_TXT):
     m(name, expr, None, folder)
 
@@ -419,7 +419,7 @@ txt('Hubs context',
 txt('Capacity k context',
     '"Memphis sorts " & FORMAT ( CALCULATE ( [Sort capacity], D_Hub[HubKey] = "MEM" ) / 1000, "#,0" ) & "k/h"')
 
-# ─────────────────────────── énergie ───────────────────────────
+# ─────────────────────────── energy ───────────────────────────
 F_ENE = '09 Energy & fuel'
 
 def ey(name, col, fmt='#,0', desc=None):
@@ -494,7 +494,7 @@ txt('Aviation efficiency context',
 txt('Jet share context', '"of all Scope 1 and 2 energy"')
 txt('Aircraft cut context', '"Cut since 2005"')
 
-# étiquettes de tableau
+# table labels
 m('Fleet %', 'FORMAT ( DIVIDE ( [Aircraft], [Fleet total] ), "0.0%" )', None, F_TXT)
 m('Lift %', 'FORMAT ( [Payload share], "0.0%" )', None, F_TXT)
 m('Ownership',
@@ -573,20 +573,20 @@ def build():
         for ft, fc, tt, tc in RELATIONS:
             f.write(f'relationship {lt("rel", ft, fc, tt, tc)}\n'
                     f'\tfromColumn: {ft}.{fc}\n\ttoColumn: {tt}.{tc}\n\n')
-    # contrôle : chaque colonne du TMDL existe dans le CSV
+    # check: every TMDL column exists in the CSV
     bad = []
     for t in TABLES:
         p = os.path.join(DATA, t.name + '.csv')
         if not os.path.exists(p):
-            bad.append(f'{t.name}.csv absent'); continue
+            bad.append(f'{t.name}.csv missing'); continue
         head = next(csv.reader(open(p, encoding='utf-8')))
         for c, ty, src in t.cols:
             if (src or c) not in head:
-                bad.append(f'{t.name}: colonne {src or c} absente du CSV')
+                bad.append(f'{t.name}: column {src or c} missing from the CSV')
         for h in head:
             if h not in [(s or c) for c, ty, s in t.cols]:
-                bad.append(f'{t.name}: colonne CSV {h} non declaree')
-    print(f'{len(TABLES)} tables, {len(M)} mesures, {len(RELATIONS)} relations')
+                bad.append(f'{t.name}: CSV column {h} not declared')
+    print(f'{len(TABLES)} tables, {len(M)} measures, {len(RELATIONS)} relationships')
     for b in bad:
         print('  !! ' + b)
     return not bad
@@ -594,4 +594,4 @@ def build():
 
 if __name__ == '__main__':
     ok = build()
-    print('OK' if ok else 'ERREURS')
+    print('OK' if ok else 'FAILURES')

@@ -1,33 +1,33 @@
 # -*- coding: utf-8 -*-
-"""pbir_lib : écriture directe de la couche rapport PBIR (schéma visualContainer 2.12.0).
+"""pbir_lib: writes the PBIR report layer directly (visualContainer schema 2.12.0).
 
-Reconstruction pour le projet MERIDIAN (FedEx), reprenant les règles éprouvées :
-  · piles CSS de polices complètes (un nom seul n'est pas résolu)
-  · fontSize entières (une décimale est ignorée et retombe à 9 pt)
-  · toute zone de texte >= 24 px, toute carte de mesure >= 56 px
-  · title / subTitle dans visualContainerObjects
-  · apostrophes doublées dans les littéraux
-  · largeur de tableau : somme des colonnes <= largeur - 45
-  · pas de pageBinding (casse le chargement du projet)
+Built for the MERIDIAN project (FedEx), applying the rules proven in practice:
+  - full CSS font stacks (a bare family name is not resolved)
+  - integer fontSize (a decimal is ignored and falls back to 9 pt)
+  - every text box >= 24 px, every measure card >= 56 px
+  - title / subTitle inside visualContainerObjects
+  - apostrophes doubled inside literals
+  - table width: sum of the columns <= width - 45
+  - no pageBinding (it breaks project loading)
 """
 import json, os, uuid, re, hashlib
 
-# ─────────────────────────── identité MERIDIAN ───────────────────────────
-BG      = '#170A2B'   # violet nuit FedEx
-PANEL   = '#2A1250'   # panneaux
-PANEL_A = 8          # transparence des panneaux
-TILE    = '#34195F'   # tuiles KPI (opaques)
-LINE    = '#57368E'   # bordures
-ORANGE  = '#FF6600'   # orange FedEx
-VIOLET  = '#B57CF6'   # violet clair, lisible sur fond sombre
-PURPLE  = '#8A3FE0'   # violet soutenu
-TEAL    = '#FF9248'   # orange clair (remplace le sarcelle)
+# ─────────────────────────── MERIDIAN identity ───────────────────────────
+BG      = '#170A2B'   # FedEx midnight purple
+PANEL   = '#2A1250'   # panels
+PANEL_A = 8          # panel transparency
+TILE    = '#34195F'   # KPI tiles (opaque)
+LINE    = '#57368E'   # borders
+ORANGE  = '#FF6600'   # FedEx orange
+VIOLET  = '#B57CF6'   # light purple, legible on a dark background
+PURPLE  = '#8A3FE0'   # strong purple
+TEAL    = '#FF9248'   # light orange (replaces the teal)
 AMBER   = '#FFB800'
 ROSE    = '#FF4D6A'
 GREEN   = '#4ADE80'
-INK     = '#FFFFFF'   # texte fort
-MUTED   = '#DCD2F0'   # texte courant
-DIM     = '#C3B5E0'   # texte secondaire, eclairci pour la lisibilite
+INK     = '#FFFFFF'   # strong text
+MUTED   = '#DCD2F0'   # body text
+DIM     = '#C3B5E0'   # secondary text, lightened for legibility
 GRID    = '#3E2865'
 
 SERIES = [ORANGE, VIOLET, '#FF9248', PURPLE, '#FFC48A', '#D8B4FE', AMBER, '#7C3AED', ROSE, GREEN]
@@ -39,7 +39,7 @@ FD  = "'DIN', wf_standard-font, helvetica, arial, sans-serif"
 
 W, H = 1600, 900
 RAIL_W = 120
-X0, X1 = 144, 1576          # zone de contenu
+X0, X1 = 144, 1576          # content area
 CW = X1 - X0                # 1432
 
 SCHEMA = "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json"
@@ -52,9 +52,9 @@ def warn(msg):
 def warnings():
     return list(_warn)
 
-# ─────────────────────────── helpers d'expression ───────────────────────────
+# ─────────────────────────── expression helpers ───────────────────────────
 def esc(s):
-    """Littéral texte PBIR : entouré d'apostrophes, apostrophes internes doublées."""
+    """PBIR text literal: wrapped in apostrophes, inner apostrophes doubled."""
     return "'" + str(s).replace("'", "''") + "'"
 
 def lit(v):
@@ -77,7 +77,7 @@ def colmeas(entity, prop):
         "Expression": {"SourceRef": {"Entity": entity}}, "Property": prop}}}}}
 
 def fz(v):
-    """Taille de police : toujours un entier (Power BI ignore les décimales sur les axes)."""
+    """Font size: always an integer (Power BI ignores decimals on axes)."""
     return num(int(round(v)))
 
 def fld(entity, prop, measure=True, active=None):
@@ -89,7 +89,7 @@ def fld(entity, prop, measure=True, active=None):
     return f
 
 def parse(ref):
-    """'Metrics.Total aircraft' -> (entity, prop, is_measure). Un préfixe '#' force une colonne."""
+    """'Metrics.Total aircraft' -> (entity, prop, is_measure). A '#' prefix forces a column."""
     m = ref.startswith('#')
     if m:
         ref = ref[1:]
@@ -97,7 +97,7 @@ def parse(ref):
     return e, p, (not m)
 
 def agg(ref, func=1):
-    """Projection agregee. func : 0 = Somme, 1 = Moyenne, 2 = Min, 3 = Max, 4 = Nombre."""
+    """Aggregated projection. func: 0 = Sum, 1 = Average, 2 = Min, 3 = Max, 4 = Count."""
     e, p, meas = parse(ref)
     name = {0: 'Sum', 1: 'Average', 2: 'Min', 3: 'Max', 4: 'Count'}[func]
     return {"field": {"Aggregation": {
@@ -110,7 +110,7 @@ def proj(ref, active=None):
     e, p, meas = parse(ref)
     return fld(e, p, meas, active)
 
-# ─────────────────────────── enveloppes standard ───────────────────────────
+# ─────────────────────────── standard wrappers ───────────────────────────
 def _off(*keys):
     return {k: [{"properties": {"show": boo(False)}}] for k in keys}
 
@@ -195,7 +195,7 @@ class Page:
 def _pos(x, y, w, h):
     return {"x": round(x), "y": round(y), "width": round(w), "height": round(h)}
 
-# ─────────────────────────── primitives visuelles ───────────────────────────
+# ─────────────────────────── visual primitives ───────────────────────────
 def image(page, x, y, w, h, name, scaling="Fit"):
     return page.add({"_k": "im", "position": _pos(x, y, w, h), "visual": {
         "visualType": "image",
@@ -207,9 +207,9 @@ def image(page, x, y, w, h, name, scaling="Fit"):
         "visualContainerObjects": vco(tooltip=False)}})
 
 def text(page, x, y, w, h, runs, align="left", valign=None):
-    """runs : [(texte, taille pt, couleur, police)] : hauteur minimale 24 px."""
+    """runs: [(text, size pt, colour, font)]: minimum height 24 px."""
     if h < 24:
-        warn(f"{page.name}: zone de texte de {h}px (<24) -> barre de defilement")
+        warn(f"{page.name}: text box of {h}px (<24) -> scrollbar")
     tr = [{"value": t, "textStyle": {"fontFamily": f, "fontSize": f"{int(round(s))}pt", "color": c}}
           for t, s, c, f in runs]
     para = {"textRuns": tr, "horizontalTextAlignment": align}
@@ -223,7 +223,7 @@ def label(page, x, y, w, txt, size=11, col=None, font=None, align="left", h=None
                 [(txt, size, col or MUTED, font or FT)], align)
 
 def panel(page, x, y, w, h, title=None, sub=None, radius=14):
-    """Panneau vide (fond + bordure) posé sous un groupe de visuels."""
+    """Empty panel (background + border) laid under a group of visuals."""
     return page.add({"_k": "pn", "position": _pos(x, y, w, h), "visual": {
         "visualType": "image",
         "objects": {"general": [{"properties": {"imageUrl": {"expr": {"ResourcePackageItem": {
@@ -233,10 +233,10 @@ def panel(page, x, y, w, h, title=None, sub=None, radius=14):
 
 def card(page, x, y, w, h, ref, size=32, col=None, font=None, align="left", wrap=False,
          fmt=None, units=None):
-    """Carte de mesure. Le visuel card centre toujours sa valeur ; h >= 2.6 x taille en pt."""
+    """Measure card. The card visual always centres its value; h >= 2.6 x size in pt."""
     need = max(56, int(round(size * 2.6)))
     if h < need:
-        warn(f"{page.name}: carte {ref} h={h} < {need} pour {size}pt -> valeur invisible")
+        warn(f"{page.name}: card {ref} h={h} < {need} for {size}pt -> value invisible")
     o = {
         "labels": [{"properties": {"color": color(col or INK), "fontSize": fz(size),
                                    "fontFamily": slit(font or FD), "alignment": slit(align)}}],
@@ -254,12 +254,12 @@ def card(page, x, y, w, h, ref, size=32, col=None, font=None, align="left", wrap
         "visualContainerObjects": vco(tooltip=False),
         "drillFilterOtherVisuals": True}})
 
-# ─────────────────────────── tuile KPI ───────────────────────────
+# ─────────────────────────── KPI tile ───────────────────────────
 KY, KH = 110, 188
 
 def kpi(page, x, y, w, h, lab, ref, ctx=None, accent=None, vsize=40, lsize=13, csize=13,
         units=1, prec=None, icon=None):
-    """Tuile KPI : bande d'accent, pictogramme, libelle, valeur, ligne de contexte."""
+    """KPI tile: accent band, pictogram, label, value, context line."""
     a = accent or ORANGE
     page.add({"_k": "kb", "position": _pos(x, y, w, h), "visual": {
         "visualType": "image",
@@ -293,7 +293,7 @@ def _accent_png(c):
 def accents_used():
     return dict(_ACC)
 
-# ─────────────────────────── graphiques ───────────────────────────
+# ─────────────────────────── charts ───────────────────────────
 def _axis(show=True, size=14, title=None, grid=False, units=1, col=None):
     p = {"show": boo(show), "labelColor": color(col or MUTED), "fontSize": fz(size),
          "fontFamily": slit(FT), "showAxisTitle": boo(bool(title)),
@@ -431,11 +431,11 @@ def scatter(page, x, y, w, h, cat, xm, ym, size=None, title=None, sub=None, lege
 
 def mapscatter(page, x, y, w, h, cat, lon, lat, size=None, bounds=None, bubble=-8,
                labels=True, lsize=11, fill=None, tips=None):
-    """Couche vivante posee sur le planisphere dessine.
+    """Live layer laid over the drawn planisphere.
 
-    Les bornes d'axes reprennent exactement la projection du PNG (lon0, lon1, lat0, lat1),
-    de sorte qu'un hub tombe au bon endroit sur les continents. Les bulles sont de vraies
-    donnees : elles se filtrent, se cliquent et se redimensionnent avec le modele."""
+    The axis bounds reproduce the PNG projection exactly (lon0, lon1, lat0, lat1), so
+    that a hub lands in the right place on the continents. The bubbles are real data:
+    they filter, they respond to clicks and they resize with the model."""
     lo0, lo1, la0, la1 = bounds
     q = {"queryState": {"Category": {"projections": [proj(cat, active=True)]},
                         "X": {"projections": [agg(lon, 1)]},
@@ -479,46 +479,46 @@ def mapvis(page, x, y, w, h, cat, lat, lon, size=None, title=None, sub=None, bub
         "visualContainerObjects": vco(title, sub, panel=True, tooltip=tooltip),
         "drillFilterOtherVisuals": True}})
 
-# ─────────────────────────── tableau ───────────────────────────
-HDR_ZONE = 150     # titre + sous-titre + ligne d'en-tete, mesure sur les captures
-SUB_H = 26         # ce que rend un tableau sans sous-titre
+# ─────────────────────────── table ───────────────────────────
+HDR_ZONE = 150     # title + subtitle + header row, measured on the screenshots
+SUB_H = 26         # what a table without a subtitle renders
 
 def row_height(size, rowpad):
-    """Hauteur reelle d'une ligne de tableEx, recalee sur les captures de l'utilisateur.
+    """Real height of a tableEx row, calibrated against the report screenshots.
 
-    Verifie contre quatre tableaux de tailles differentes : 13pt/rowpad 8 -> 40,5 px,
-    12pt/rowpad 0 -> 22,5 px."""
+    Checked against four tables of different sizes: 13pt/rowpad 8 -> 40.5 px,
+    12pt/rowpad 0 -> 22.5 px."""
     return size * 1.33 + 2 * rowpad + 7
 
 def table(page, x, y, w, h, cols, widths, title=None, sub=None, sort=None, sortdir="Descending",
           size=13, hdrsize=13, rowpad=2, tooltip=True, vfilter=None, imageh=None,
           hdrcolor=None, align=None, rows=None, tips=None):
-    """cols : liste de références. widths : largeurs en px (somme <= w - 45).
-    rows : nombre de lignes attendu, pour verifier qu'aucune barre de defilement n'apparait.
-    Les largeurs sont des minimums : FITW, s'il est branche, elargit toute colonne qui
-    couperait son en-tete ou sa plus longue valeur."""
-    # Remplissage : les lignes s'ecartent pour occuper toute la hauteur du panneau.
-    # Un tableau court ne laisse plus un bloc vide sous sa derniere ligne.
+    """cols: list of references. widths: widths in px (sum <= w - 45).
+    rows: expected row count, used to verify that no scrollbar appears.
+    The widths are minimums: FITW, when wired in, widens any column that would cut
+    its header or its longest value."""
+    # Fill: the rows spread out to occupy the full height of the panel.
+    # A short table no longer leaves an empty block under its last row.
     if rows:
-        # 40 px de reserve : le PDF du rapport reel a montre une barre de defilement
-        # sur des tableaux que le modele donnait a 97 % de remplissage
+        # 40 px of headroom: the PDF of the real report showed a scrollbar
+        # on tables that the model put at 97 % fill
         libre = (h - 40 - (HDR_ZONE if sub else HDR_ZONE - SUB_H)) / rows - size * 1.33 - 7
         rowpad = int(max(0, min(20, libre / 2)))
     if FITW:
         widths = FITW(cols, widths, w, size, hdrsize, sort)
     s = sum(widths)
     if s > w - 45:
-        warn(f"{page.name}: tableau {title!r} colonnes={s} > {w-45} -> defilement horizontal")
+        warn(f"{page.name}: table {title!r} columns={s} > {w-45} -> horizontal scrolling")
     if rows:
         need = (HDR_ZONE if sub else HDR_ZONE - SUB_H) + rows * row_height(size, rowpad)
         if need < h * 0.82:
-            warn(f'{title or cols[0]} : {rows} lignes n\'occupent que {need:.0f} px '
-                 f'sur {h} px -> panneau a moitie vide (augmenter rowpad ou size)')
+            warn(f'{title or cols[0]}: {rows} rows fill only {need:.0f} px '
+                 f'of {h} px -> panel half empty (raise rowpad or size)')
         if need > h:
-            warn(f"{page.name}: tableau {title!r} {rows} lignes exigent {need:.0f}px > {h}px "
-                 f"-> barre de defilement")
+            warn(f"{page.name}: table {title!r} {rows} rows need {need:.0f}px > {h}px "
+                 f"-> scrollbar")
     if len(cols) != len(widths):
-        raise ValueError(f"{title}: {len(cols)} colonnes pour {len(widths)} largeurs")
+        raise ValueError(f"{title}: {len(cols)} columns for {len(widths)} widths")
     q = {"queryState": {"Values": {"projections": [proj(c) for c in cols]}}}
     if tips:
         q["queryState"]["Tooltips"] = {"projections": [proj(t) for t in tips]}
@@ -557,7 +557,7 @@ def table(page, x, y, w, h, cols, widths, title=None, sub=None, sort=None, sortd
         v["filterConfig"] = measure_filter(*vfilter)
     return page.add(v)
 
-# ─────────────────────────── segment ───────────────────────────
+# ─────────────────────────── slicer ───────────────────────────
 def slicer(page, x, y, w, h, ref, horizontal=True, single=True, size=13, header=False,
            padding=4, bg=None, fg=None, vfilter=None):
     o = {
@@ -583,7 +583,7 @@ def slicer(page, x, y, w, h, ref, horizontal=True, single=True, size=13, header=
         v["filterConfig"] = measure_filter(*vfilter)
     return page.add(v)
 
-# ─────────────────────────── bouton de navigation ───────────────────────────
+# ─────────────────────────── navigation button ───────────────────────────
 def navbutton(page, x, y, w, h, target, tip):
     st = lambda k, tr, cfill: {"properties": {"show": boo(True), "transparency": num(tr),
                                               "fillColor": color(cfill)},
@@ -614,7 +614,7 @@ def navbutton(page, x, y, w, h, target, tip):
         },
         "drillFilterOtherVisuals": True}})
 
-# ─────────────────────────── écriture du rapport ───────────────────────────
+# ─────────────────────────── writing the report ───────────────────────────
 def write_report(root, pages, order, theme_name, images):
     rep = os.path.join(root, 'definition')
     os.makedirs(os.path.join(rep, 'pages'), exist_ok=True)

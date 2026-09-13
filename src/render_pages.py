@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""render_pages : aperçu PNG des pages à partir du JSON PBIR, pour contrôler la mise
-en page (chevauchements, marges, textes trop longs) avant de livrer."""
+"""render_pages: PNG preview of the pages from the PBIR JSON, to check the layout
+(overlaps, margins, over-long text) before delivery."""
 import csv, json, math, os, re, glob
 from PIL import Image, ImageDraw, ImageFont
 
@@ -20,7 +20,7 @@ def hexc(s):
     return tuple(int(s[i:i+2], 16) for i in (0, 2, 4))
 
 def val(o, *path):
-    """Descend dans un objet PBIR jusqu'à la valeur littérale."""
+    """Walks down a PBIR object to the literal value."""
     try:
         for p in path:
             o = o[p]
@@ -43,7 +43,7 @@ def val(o, *path):
     except Exception:
         return None
 
-# ─────────── valeurs réelles des mesures affichées en carte ───────────
+# ─────────── real values of the measures shown in cards ───────────
 def load(name):
     with open(os.path.join(DATA, name + '.csv'), encoding='utf-8') as f:
         return list(csv.DictReader(f))
@@ -110,7 +110,7 @@ def compute():
       'Operating margin': f(num(f26['OperatingMarginPct']), 1) + '%',
       'Net income': f(num(f26['NetIncome'])), 'EPS': '$' + f(num(f26['EPSDiluted']), 2),
       'Capex': f(num(f26['Capex'])),
-      # lignes de contexte
+      # context lines
       'Fleet context': f'{f(trunk)} trunk · {f(feeder)} feeders',
       'Payload context': f'{f(pay/2204.62)} t at full load',
       'Average payload context': f'Heaviest: {f(max(num(r["PayloadLbs"]) for r in ac))} lb',
@@ -157,8 +157,8 @@ def compute():
     return V
 
 VALUES = compute()
-# les chaines relevees en DAX sur le modele font foi : l'apercu doit montrer
-# exactement ce que Power BI affiche, sinon il me ment sur les debordements
+# the strings read in DAX from the model are authoritative: the preview must show
+# exactly what Power BI displays, otherwise it lies to me about overflows
 try:
     import json as _j
     _rv = _j.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -167,9 +167,9 @@ try:
 except Exception:
     pass
 
-# ─────────── séries pour les graphiques ───────────
+# ─────────── series for the charts ───────────
 def series_for(vis):
-    """Retourne [(label, valeur)] approximatif pour dessiner un graphique."""
+    """Returns an approximate [(label, value)] for drawing a chart."""
     try:
         qs = vis['query']['queryState']
         cat = qs.get('Category', {}).get('projections', [{}])[0]
@@ -216,7 +216,7 @@ def series_for(vis):
     out = sorted(agg.items(), key=lambda kv: -kv[1])
     return out[:16]
 
-# ─────────── rendu ───────────
+# ─────────── rendering ───────────
 def draw_page(pdir, outfile):
     W, H = 1600, 900
     im = Image.new('RGB', (W, H), (10, 9, 18))
@@ -230,7 +230,7 @@ def draw_page(pdir, outfile):
         p = v['position']; x, y, w, h = p['x'], p['y'], p['width'], p['height']
         V = v['visual']; t = V['visualType']
         vco = V.get('visualContainerObjects', {})
-        # panneau
+        # panel
         if val(vco, 'background', 0, 'properties', 'show') is True:
             c = hexc(val(vco, 'background', 0, 'properties', 'color'))
             tr = val(vco, 'background', 0, 'properties', 'transparency') or 0
@@ -348,7 +348,7 @@ def draw_page(pdir, outfile):
             if sum(widths) > w - 45:
                 d.rectangle([x, y, x + w, y + h], outline=(255, 0, 0), width=3)
         elif t == 'scatterChart' and val(V, 'objects', 'categoryAxis', 0, 'properties', 'start') is not None:
-            # couche de hubs posee sur le planisphere : on la dessine avec les memes bornes
+            # hub layer laid over the planisphere: drawn with the same bounds
             ax0 = float(val(V, 'objects', 'categoryAxis', 0, 'properties', 'start'))
             ax1 = float(val(V, 'objects', 'categoryAxis', 0, 'properties', 'end'))
             ay0 = float(val(V, 'objects', 'valueAxis', 0, 'properties', 'start'))
@@ -376,7 +376,7 @@ def draw_page(pdir, outfile):
                 d.text((ax + aw / 2 - 30, ay + ah / 2), t, font=F(13), fill=(110, 104, 144))
             elif t == 'barChart':
                 mx = max(v for _, v in data) or 1
-                n = min(len(data), max(1, int(ah / 22)))   # hauteur reelle d'une categorie
+                n = min(len(data), max(1, int(ah / 22)))   # real height of a category
                 bh = ah / n
                 for i, (k, vv) in enumerate(data[:n]):
                     yy = ay + i * bh
@@ -438,10 +438,10 @@ def draw_page(pdir, outfile):
                     py = ay + ah * (90 - la) / 180
                     rr = 3 + 12 * (num(r['SortCapacityHr']) / 484000) ** 0.5
                     d.ellipse([px - rr, py - rr, px + rr, py + rr], fill=(255, 106, 31, 190))
-                d.text((ax + 6, ay + ah - 18), 'carte (rendu approximatif)', font=F(11),
+                d.text((ax + 6, ay + ah - 18), 'map (approximate render)', font=F(11),
                        fill=(110, 104, 144))
         boxes.append((x, y, w, h, t, v['name']))
-    # contrôle de chevauchement des panneaux
+    # panel overlap check
     im.save(outfile)
     return boxes
 
@@ -456,7 +456,7 @@ def main():
         o = os.path.join(OUT, name + '.png')
         draw_page(pdir, o)
         files.append(o)
-        print('rendu', name)
+        print('rendered', name)
     return files
 
 if __name__ == '__main__':

@@ -9,7 +9,7 @@ RES  = os.path.join(REP, 'StaticResources', 'RegisteredResources')
 
 err, ok = [], []
 
-# ── inventaire du modèle
+# ── model inventory
 measures, columns = set(), {}
 mt = open(os.path.join(SM, 'definition', 'tables', 'Metrics.tmdl'), encoding='utf-8').read()
 for m in re.finditer(r"^\tmeasure\s+('([^']+)'|[^\s=]+)\s*=", mt, re.M):
@@ -22,7 +22,7 @@ for f in glob.glob(os.path.join(SM, 'definition', 'tables', '*.tmdl')):
         columns[t].add(c.group(2) or c.group(1))
 ok.append(f'{len(measures)} measures and {sum(len(v) for v in columns.values())} columns in the model')
 
-# ── colonnes et mesures référencées par le DAX des mesures
+# ── columns and measures referenced by the DAX of the measures
 tabs = {}
 for f in glob.glob(os.path.join(SM, 'definition', 'tables', '*.tmdl')):
     t = os.path.basename(f)[:-5]
@@ -38,15 +38,15 @@ for mm in re.finditer(r"^\tmeasure\s+('([^']+)'|[^\s=]+)\s*=(.*?)(?=^\t(?:measur
     for ref in re.finditer(r"(\w+)\[([^\]]+)\]", body):
         t, c = ref.group(1), ref.group(2)
         if t in tabs and c not in tabs[t] and c not in measures:
-            dax_bad.append(f'mesure [{nm}] reference {t}[{c}] qui n existe pas')
+            dax_bad.append(f'measure [{nm}] references {t}[{c}], which does not exist')
     for ref in re.finditer(r"(?<![\w\]])\[([^\]]+)\]", body):
         c = ref.group(1)
         if c not in measures:
-            dax_bad.append(f'mesure [{nm}] reference la mesure [{c}] qui n existe pas')
+            dax_bad.append(f'measure [{nm}] references measure [{c}], which does not exist')
 err += dax_bad
 ok.append(f'{len(dax_bad)} broken DAX references')
 
-# ── références des visuels
+# ── visual references
 used_m, used_c, missing = set(), set(), []
 def walk(o, path=''):
     if isinstance(o, dict):
@@ -67,17 +67,17 @@ for f in files:
     walk(json.load(open(f, encoding='utf-8')))
 for e, p in sorted(used_m):
     if e == 'Metrics' and p not in measures:
-        missing.append(f'mesure absente : {e}[{p}]')
+        missing.append(f'missing measure: {e}[{p}]')
     elif e != 'Metrics' and p not in columns.get(e, set()):
-        missing.append(f'mesure/colonne absente : {e}[{p}]')
+        missing.append(f'missing measure/column: {e}[{p}]')
 for e, p in sorted(used_c):
     if p not in columns.get(e, set()):
-        missing.append(f'colonne absente : {e}[{p}]')
+        missing.append(f'missing column: {e}[{p}]')
 err += missing
 ok.append(f'{len(files)} visuals referencing {len(used_m)} measures and {len(used_c)} columns, '
           f'{len(missing)} missing')
 
-# ── textes de carte qui deborderaient en largeur (le wordWrap est sans effet)
+# ── card texts that would overflow in width (wordWrap has no effect here)
 try:
     import importlib, sys
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -96,7 +96,7 @@ try:
             nm = list(V['query']['queryState']['Values']['projections'][0]['field'].values())[0]['Property']
         except Exception:
             continue
-        # priorite au texte releve en DAX sur le modele : c'est ce que Power BI affiche
+        # text read in DAX from the model wins: that is what Power BI displays
         s = CARDS.get(nm, RP.VALUES.get(nm))
         if not s:
             nocard.append(nm)
@@ -111,7 +111,7 @@ try:
 except Exception as e:
     ok.append(f'card width check not run ({e})')
 
-# ── titres et sous-titres de visuel qui deborderaient de leur panneau
+# ── visual titles and subtitles that would overflow their panel
 tt = []
 try:
     from PIL import ImageFont as _IF
@@ -127,13 +127,13 @@ try:
             txt = RP.val(vco, role, 0, 'properties', 'text')
             sz = (RP.val(vco, role, 0, 'properties', 'fontSize') or dflt) * 1.33
             if txt and _IF.truetype(fnt, int(sz)).getlength(txt) > w:
-                tt.append(f"{v['name']} {role} : « {txt} » depasse {w:.0f}px")
+                tt.append(f"{v['name']} {role}: \"{txt}\" exceeds {w:.0f}px")
 except Exception as e:
     ok.append(f'visual title check not run ({e})')
 err += tt
 ok.append(f'{len(tt)} visual titles too wide')
 
-# ── tailles de police entières
+# ── integer font sizes
 dec = []
 for f in files:
     src = open(f, encoding='utf-8').read()
@@ -143,14 +143,14 @@ for f in files:
 err += dec
 ok.append(f'{len(dec)} decimal font sizes')
 
-# ── chaque colonne de tableau doit contenir son en-tete ET sa plus longue valeur
-#    (c'est la panne que l'utilisateur signale en boucle : « Internatio... », « Corporate & o... »)
+# ── every table column must hold its header AND its longest value
+#    (this is the failure reported over and over: 'Internatio...', 'Corporate & o...')
 trunc = []
 try:
     from PIL import ImageFont
     FBOLD_T = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
     FREG_T = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
-    # correspondance nom affiche -> colonne du CSV, lue dans le TMDL (source de verite)
+    # display name -> CSV column mapping, read from the TMDL (source of truth)
     COLSRC = {}
     for tf in glob.glob(os.path.join(ROOT, '*.SemanticModel', 'definition', 'tables', '*.tmdl')):
         ent = os.path.basename(tf)[:-5]
@@ -203,7 +203,7 @@ except Exception as e:
 err += trunc
 ok.append(f'{len(trunc)} table columns too narrow')
 
-# ── taux de remplissage : un tableau ne doit pas laisser son panneau a moitie vide
+# ── fill ratio: a table must not leave its panel half empty
 vide = []
 try:
     import pbir_lib as _L
@@ -227,7 +227,7 @@ try:
         r = occ / v['position']['height']
         taux.append(r)
         if r < 0.85:
-            vide.append(f"{ttl} : {r*100:.0f}% du panneau occupe")
+            vide.append(f"{ttl}: {r*100:.0f}% of the panel filled")
     if taux:
         ok.append(f'{len(vide)} tables leaving their panel half empty '
                   f'(fill {min(taux)*100:.0f}-{max(taux)*100:.0f}%)')
@@ -235,7 +235,7 @@ except Exception as e:
     ok.append(f'panel fill check not run ({e})')
 err += vide
 
-# ── largeurs de tableau
+# ── table widths
 wide = []
 for f in files:
     v = json.load(open(f, encoding='utf-8'))
@@ -249,7 +249,7 @@ for f in files:
 err += wide
 ok.append(f'{len(wide)} tables that would overflow horizontally')
 
-# ── images déclarées / présentes
+# ── images declared / present
 rep = json.load(open(os.path.join(REP, 'definition', 'report.json'), encoding='utf-8'))
 decl = {i['name'] for p in rep['resourcePackages'] if p['name'] == 'RegisteredResources'
         for i in p['items'] if i['type'] == 'Image'}
@@ -259,14 +259,14 @@ for f in files:
     for m in re.finditer(r'"ItemName":\s*"([^"]+)"', open(f, encoding='utf-8').read()):
         used_img.add(m.group(1))
 for n in sorted(used_img - decl):
-    err.append(f'image utilisee mais non declaree dans report.json : {n}')
+    err.append(f'image used but not declared in report.json: {n}')
 for n in sorted(used_img - present):
-    err.append(f'image utilisee mais absente du dossier : {n}')
+    err.append(f'image used but missing from the folder: {n}')
 for n in sorted(decl - present):
-    err.append(f'image declaree mais absente du dossier : {n}')
+    err.append(f'image declared but missing from the folder: {n}')
 ok.append(f'{len(used_img)} images used, {len(decl)} declared, {len(present)} present')
 
-# ── apostrophes dans les littéraux
+# ── apostrophes in literals
 bad = []
 for f in files:
     for m in re.finditer(r'"Value":\s*"\'((?:[^\'"]|\'\')*)\'"', open(f, encoding='utf-8').read()):
@@ -279,7 +279,7 @@ for f in files:
 err += bad
 ok.append(f"{len(bad)} literals with an unescaped apostrophe")
 
-# ── pages et navigation
+# ── pages and navigation
 pages = json.load(open(os.path.join(REP, 'definition', 'pages', 'pages.json'), encoding='utf-8'))
 names = set(pages['pageOrder'])
 for f in files:
@@ -289,12 +289,12 @@ for f in files:
             err.append(f'bouton vers une page inexistante : {m.group(1)}')
 ok.append(f"{len(names)} pages, navigation targets consistent")
 
-# ── pas de pageBinding
+# ── no pageBinding
 for f in glob.glob(os.path.join(REP, 'definition', 'pages', '*', 'page.json')):
     if 'pageBinding' in open(f, encoding='utf-8').read():
         err.append(f'pageBinding present dans {f}')
 
-# ── chevauchements de panneaux dans une même page
+# ── panel overlaps within a single page
 for pdir in glob.glob(os.path.join(REP, 'definition', 'pages', 'p*')):
     if not os.path.isdir(pdir):
         continue

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-"""MERIDIAN : génération des CSV du modèle FedEx.
-Toutes les valeurs proviennent de sources publiques FedEx (10-K FY2026 et FY2025,
-Statistical Book Q4 FY2026 et FY2025, rapports Corporate Responsibility, communiqués).
-Aucune valeur n'est estimée sauf mention explicite dans la colonne Source.
+"""MERIDIAN: generation of the CSV files behind the FedEx model.
+Every value comes from public FedEx sources (10-K FY2026 and FY2025, Statistical
+Book Q4 FY2026 and FY2025, Corporate Responsibility reports, press releases).
+No value is estimated unless the Source column says so explicitly.
 """
 import csv, os
 
@@ -16,7 +16,7 @@ def w(name, header, rows):
         c = csv.writer(f, lineterminator='\n')
         c.writerow(header)
         c.writerows(rows)
-    print(f'{name}.csv  {len(rows)} lignes')
+    print(f'{name}.csv  {len(rows)} rows')
 
 # ───────────────────────── D_Aircraft ─────────────────────────
 # 10-K FY2026 Item 2 (owned / leased / not yet placed in service) + max gross structural payload
@@ -43,8 +43,8 @@ w('D_Aircraft',
    'InFleet','NotInService','OnOrder','FleetPayloadLbs','IsBoeing','SortOrder','InServiceSince'],
   rows)
 
-# ───────────────────────── F_Fleet : effectif par exercice ─────────────────────────
-# Stat Book Q4 FY2026 (FY2024-FY2026) et Q4 FY2025 (FY2023)
+# ───────────────────────── F_Fleet: headcount by fiscal year ─────────────────────────
+# Stat Book Q4 FY2026 (FY2024-FY2026) and Q4 FY2025 (FY2023)
 FLEET = {
     'B752':  {2023:115, 2024: 92, 2025: 90, 2026: 86},
     'B767F': {2023:128, 2024:138, 2025:145, 2026:152},
@@ -64,8 +64,8 @@ for k, d in FLEET.items():
         rows.append([fy, k, n, n * pay[k]])
 w('F_Fleet', ['FiscalYear','AircraftKey','Aircraft','PayloadLbs'], rows)
 
-# ───────────────────────── F_FleetPlan : variations planifiées ─────────────────────────
-# Stat Book Q4 FY2026 : livraisons (+) et retraits (-) planifiés FY2027-FY2032
+# ───────────────────────── F_FleetPlan: planned changes ─────────────────────────
+# Stat Book Q4 FY2026: planned deliveries (+) and retirements (-) FY2027-FY2032
 PLAN = {
     'B777F': {2027: 5, 2028: 5},
     'MD11':  {2028:-2, 2029:-6, 2030:-7, 2031:-7, 2032:-7},
@@ -79,7 +79,7 @@ for k, d in PLAN.items():
 w('F_FleetPlan', ['FiscalYear','AircraftKey','NetChange','Deliveries','Retirements'], rows)
 
 # ───────────────────────── D_Hub ─────────────────────────
-# 10-K FY2026 Item 2 : tableau des installations de tri majeures. Lat/lon = référence aéroport (WGS84).
+# 10-K FY2026 Item 2: table of major sorting facilities. Lat/lon = airport reference (WGS84).
 HUBS = [
  ('MEM','Memphis SuperHub','Memphis','Tennessee','United States','North America','Primary',967,5115929,484000,'Memphis-Shelby County Airport Authority',2036,35.0424,-89.9767,1),
  ('IND','Indianapolis Hub','Indianapolis','Indiana','United States','North America','National',449,3229112,164000,'Indianapolis Airport Authority',2053,39.7173,-86.2944,2),
@@ -97,8 +97,8 @@ HUBS = [
  ('CAN','Guangzhou','Guangzhou','Guangdong','China','Asia-Pacific','International',155,873006,36000,'Guangdong Airport Management Corp.',2029,23.3924,113.2988,14),
  ('KIX','Osaka','Osaka','Kansai','Japan','Asia-Pacific','International',17,425206,9000,'Kansai Airports',2029,34.4347,135.2440,15),
 ]
-# Rang par capacite de tri, calcule ici plutot qu'en DAX : un filtre de visuel sur une
-# colonne est applique de facon fiable par Power BI, un filtre sur une mesure ne l'est pas.
+# Rank by sorting capacity, computed here rather than in DAX: a visual filter on a
+# column is applied reliably by Power BI, a filter on a measure is not.
 _ordre = {h[0]: i + 1 for i, h in enumerate(sorted(HUBS, key=lambda x: -x[9]))}
 rows = [[h[0],h[1],h[2],h[3],h[4],h[5],h[6],h[7],h[8],h[9],h[10],h[11],h[12],h[13],h[14],
          round(h[9]/h[8],2) if h[8] else 0, _ordre[h[0]]] for h in HUBS]
@@ -107,7 +107,7 @@ w('D_Hub', ['HubKey','Hub','City','Region','Country','Continent','HubClass','Acr
             'PiecesPerSqFt','CapacityRank'], rows)
 
 # ───────────────────────── F_Financial ─────────────────────────
-# 10-K / XBRL SEC. Montants en millions USD.
+# 10-K / XBRL SEC. Amounts in millions of USD.
 FIN = [
  (2015,47453,None,None,None,4347),
  (2016,50365,None,None,None,4818),
@@ -132,7 +132,7 @@ w('F_Financial', ['FiscalYear','FiscalYearLabel','Revenue','OperatingIncome','Ne
                   'Capex','OperatingMarginPct','NetMarginPct','CapexIntensityPct'], rows)
 
 # ───────────────────────── F_Segment ─────────────────────────
-# 10-K FY2025 (recast FY2023-FY2025) et 10-K FY2026 / Stat Book FY2026 pour FY2026.
+# 10-K FY2025 (recast FY2023-FY2025) and 10-K FY2026 / Stat Book FY2026 for FY2026.
 SEG = [
  (2023,'Federal Express',75884,4193),(2023,'FedEx Freight',10084,1936),(2023,'Corporate & other',4187,-1217),
  (2024,'Federal Express',74663,4819),(2024,'FedEx Freight', 9429,1821),(2024,'Corporate & other',3601,-1081),
@@ -142,8 +142,8 @@ SEG = [
 rows = [[fy,s,r,o, round(o/r*100,2) if r else ''] for fy,s,r,o in SEG]
 w('F_Segment', ['FiscalYear','Segment','Revenue','OperatingIncome','OperatingMarginPct'], rows)
 
-# ───────────────────────── F_Service : lignes de service ─────────────────────────
-# Stat Book Q4 FY2026 : CA, volume quotidien moyen (milliers), yield par colis.
+# ───────────────────────── F_Service: service lines ─────────────────────────
+# Stat Book Q4 FY2026: revenue, average daily volume (thousands), yield per package.
 SERV = [
  ('U.S. priority',            'U.S. domestic',      1, 11603, 1654, 26.13,  1600, 25.30),
  ('U.S. deferred',            'U.S. domestic',      2,  5700, 1061, 18.76,   968, 18.59),
@@ -164,7 +164,7 @@ GEO = [(2023,'United States',64890),(2023,'International',25265),
        (2025,'United States',62916),(2025,'International',25010)]
 w('F_Geography', ['FiscalYear','Geography','Revenue'], [[a,b,c] for a,b,c in GEO])
 
-# ───────────────────────── F_Freight : LTL ─────────────────────────
+# ───────────────────────── F_Freight: LTL ─────────────────────────
 LTL = [
  (2020,102959,272.56,None),(2021,108409,282.95,None),(2022,111699,334.57,None),
  (2023, 99720,379.76,None),(2024, 93987,376.81,946),(2025, 90083,373.52,920),(2026, 86141,386.63,931),
@@ -172,8 +172,8 @@ LTL = [
 w('F_Freight', ['FiscalYear','ShipmentsPerDay','RevenuePerShipment','WeightPerShipmentLbs'],
   [[a,b,c,d if d else ''] for a,b,c,d in LTL])
 
-# ───────────────────────── F_Climate : GES ─────────────────────────
-# Rapports Corporate Responsibility + Independent Accountants Review Reports (EY).
+# ───────────────────────── F_Climate: GHG ─────────────────────────
+# Corporate Responsibility reports + Independent Accountants Review Reports (EY).
 CLI = [
  (2019,15406173, 995988,16402161,235.35,'Market-based','Published'),
  (2020,15235320, 948280,16183600,233.81,'Market-based','Published'),
@@ -188,14 +188,14 @@ for fy,s1,s2,tot,inten,basis,status in CLI:
     rows.append([fy, s1 if s1 else '', s2 if s2 else '', tot, inten, basis, status])
 w('F_Climate', ['FiscalYear','Scope1','Scope2','Scope1and2','IntensityPerRevenueMn','Scope2Basis','DataStatus'], rows)
 
-# Intensité longue série FY2009-FY2025
+# Long-run intensity series FY2009-FY2025
 INT = [(2009,427.28),(2010,407.38),(2011,376.36),(2012,353.68),(2013,336.43),(2014,316.26),
        (2015,310.06),(2016,292.23),(2017,251.13),(2018,247.55),(2019,235.35),(2020,233.81),
        (2021,209.57),(2022,192.26),(2023,185.50),(2024,179.50),(2025,169.29)]
 w('F_Intensity', ['FiscalYear','IntensityPerRevenueMn','IndexBase2009'],
   [[fy,v, round(v/427.28*100,1)] for fy,v in INT])
 
-# Scope 3 FY2025 par catégorie
+# Scope 3 FY2025 by category
 S3 = [('Purchased goods',2581809,1),
       ('Capital goods',1274556,2),
       ('Fuel & energy-related',3141136,3),
@@ -204,12 +204,12 @@ S3 = [('Purchased goods',2581809,1),
       ('Employee commuting',903670,6)]
 w('F_Scope3', ['Category','Emissions','SortOrder'], [[a,b,c] for a,b,c in S3])
 
-# ───────────────────────── F_Electric : véhicules électriques ─────────────────────────
+# ───────────────────────── F_Electric: electric vehicles ─────────────────────────
 EV = [(2022,3552),(2023,7136),(2024,8018),(2025,9446)]
 w('F_Electric', ['FiscalYear','ElectricVehicles','GrowthPct'],
   [[fy,n, round((n/EV[i-1][1]-1)*100,1) if i else ''] for i,(fy,n) in enumerate(EV)])
 
-# ───────────────────────── F_Fuel : carburant évité et SAF ─────────────────────────
+# ───────────────────────── F_Fuel: fuel avoided and SAF ─────────────────────────
 FUEL = [(2021, 65,'Fleet modernisation & fuel savings',''),
         (2022,150,'Fleet modernisation & fuel savings',''),
         (2023,147,'Fleet modernisation & fuel savings',''),
@@ -219,7 +219,7 @@ w('F_Fuel', ['FiscalYear','JetFuelAvoidedMnGal','Scope','Note'], [[a,b,c,d] for 
 SAF = [(2024,3.0,'Reported as "more than 3 million gallons"'),(2025,16.5,'Blended SAF deployed')]
 w('F_SAF', ['FiscalYear','SAFMnGal','Note'], [[a,b,c] for a,b,c in SAF])
 
-# ───────────────────────── D_Target : objectifs ─────────────────────────
+# ───────────────────────── D_Target: targets ─────────────────────────
 TGT = [
  ('Carbon-neutral operations',2040,'The whole company','Enterprise',1),
  ('Electric vehicle purchases',2030,'All parcel PUD vehicle purchases','Ground',2),
@@ -233,8 +233,8 @@ TGT = [
 ]
 w('D_Target', ['Target','TargetYear','Detail','Pillar','SortOrder'], [list(t) for t in TGT])
 
-# ───────────────────────── F_Network : indicateurs de réseau ─────────────────────────
-# 10-K FY2026 Item 1 & Item 2 (valeurs telles que publiées, souvent approximatives).
+# ───────────────────────── F_Network: network indicators ─────────────────────────
+# 10-K FY2026 Item 1 & Item 2 (values as published, often approximate).
 NET = [
  ('Countries & territories served',       220,   'countries', 'Reach',        1,'over 220'),
  ('Share of global GDP connected',         99,   '%',         'Reach',        2,'more than 99%'),
@@ -263,14 +263,14 @@ KEY = {'Countries & territories served','Airports served','Vehicles in the globa
 w('F_Network', ['Indicator','Value','Unit','Pillar','SortOrder','Basis','IsKey'],
   [list(n) + [1 if n[0] in KEY else 0] for n in NET])
 
-# ───────────────────────── F_People : effectifs ─────────────────────────
+# ───────────────────────── F_People: headcount ─────────────────────────
 PPL = [(2025,300000,210000,510000),(2026,300000,230000,530000)]
 w('F_People', ['FiscalYear','FullTime','PartTime','Total'], [list(p) for p in PPL])
 
 
-# ───────────────────────── F_Energy : consommation ─────────────────────────
-# Rapports Corporate Responsibility 2025 (FY22-FY24) et 2026 (FY23-FY25), tableaux
-# de données énergie. Publié en térajoules ; FedEx ne publie pas de volume en gallons.
+# ───────────────────────── F_Energy: consumption ─────────────────────────
+# Corporate Responsibility reports 2025 (FY22-FY24) and 2026 (FY23-FY25), energy
+# data tables. Published in terajoules; FedEx does not publish a volume in gallons.
 ENERGY = [
  (2022, 199401, 39947, 4888, 1088, 121, 3204,  8839, 261624, 315227, None),
  (2023, 184725, 36698, 3848,  971,  80, 3114,  8842, 242513, 304179, 3.37),
@@ -286,7 +286,7 @@ w('F_Energy', ['FiscalYear','JetFuel','Diesel','Petrol','LPG','GasNGV','Biodiese
                'VehicleFuel','Electricity','TotalEnergy','TotalInclScope3',
                'IntensityTJperMn','JetSharePct'], rows)
 
-# Détail par source, pour un graphique empilé
+# Breakdown by source, for a stacked chart
 SRC = [('Jet fuel', 1), ('Diesel', 2), ('Electricity', 3), ('Petrol', 4),
        ('LPG', 5), ('Natural gas', 6)]
 KEY = {'Jet fuel': 1, 'Diesel': 2, 'Electricity': 8, 'Petrol': 3, 'LPG': 4, 'Natural gas': 5}
@@ -300,7 +300,7 @@ for fy, jet, dsl, pet, lpg, gas, bio, el, t12, t3, inten in ENERGY:
 w('F_EnergySource', ['FiscalYear','Source','Energy','SortOrder','Pillar'], rows)
 
 # ───────────────────────── F_Efficiency ─────────────────────────
-# Réponses CDP Climate Change 2024 (FY23) et 2025 (FY24) : périmètre FedEx Express.
+# CDP Climate Change responses 2024 (FY23) and 2025 (FY24): FedEx Express scope.
 EFF = [
  (2023, 0.192027, 24886538316, 4778885873, 0.303517, 1016301616, 308464775),
  (2024, 0.187650, 24330569515, 4565624482, 0.298990,  942121122, 281685013),
@@ -308,20 +308,20 @@ EFF = [
 w('F_Efficiency', ['FiscalYear','AviationLperATM','AvailableTonMiles','AviationLitres',
                    'HDVLperMile','HDVMiles','HDVLitres'], [list(e) for e in EFF])
 
-# Réduction de l'intensité d'émissions des avions par rapport à 2005
+# Reduction in aircraft emissions intensity against 2005
 AVI = [(2024, 30), (2025, 32)]
 w('F_AviationIntensity', ['FiscalYear','ReductionVs2005Pct'], [list(a) for a in AVI])
 
 # ───────────────────────── D_FiscalYear ─────────────────────────
 rows = [[fy, f'FY{fy}', f'FY{str(fy)[2:]}', 1 if fy == 2026 else 0,
          'Year ended 31 May ' + str(fy),
-         1 if 2015 <= fy <= 2026 else 0,     # exercices financiers publiés
-         1 if 2023 <= fy <= 2026 else 0,     # exercices de flotte
-         1 if 2019 <= fy <= 2025 else 0,     # exercices climat
-         1 if 2022 <= fy <= 2025 else 0,     # exercices énergie
+         1 if 2015 <= fy <= 2026 else 0,     # published financial years
+         1 if 2023 <= fy <= 2026 else 0,     # fleet years
+         1 if 2019 <= fy <= 2025 else 0,     # climate years
+         1 if 2022 <= fy <= 2025 else 0,     # energy years
          ] for fy in range(2015, 2027)]
 w('D_FiscalYear', ['FiscalYear','FiscalYearLabel','FiscalYearShort','IsCurrent','PeriodEnd',
                    'IsFinancial','IsFleet','IsClimate','IsEnergy'], rows)
 
-print('\nTotal payload en flotte :', sum(r[11] for r in [[*x] for x in
+print('\nTotal fleet payload:', sum(r[11] for r in [[*x] for x in
       [[k,t,m,fam,cls,p,o,l,o+l,n,od,p*(o+l),0,0,0] for k,t,m,fam,cls,p,o,l,n,od,_,_ in AC]]), 'lbs')

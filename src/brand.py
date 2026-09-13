@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-"""brand : ressources graphiques originales du rapport MERIDIAN.
+"""brand: original graphic assets for the MERIDIAN report.
 
-Tout est dessiné ici : fond, marque, icônes de rail, silhouettes d'appareils.
-Aucun logo ni marque figurative d'entreprise n'est reproduit.
+Everything is drawn here: background, mark, rail icons, aircraft silhouettes.
+No corporate logo or figurative trademark is reproduced.
 """
 import math, os, random
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
@@ -26,21 +26,21 @@ def save(im, name):
     im.save(os.path.join(OUT, name), 'PNG', optimize=True)
     return name
 
-# ─────────────────────────── fond de page ───────────────────────────
+# ─────────────────────────── page background ───────────────────────────
 def background(w=1600, h=900):
-    """Nuit violette, meridiens et routes aeriennes. Dessin original."""
+    """Purple night, meridians and air routes. Original drawing."""
     base = (23, 10, 43)
     im = Image.new('RGB', (w, h), base)
     glow = Image.new('RGB', (w, h), base)
     gd = ImageDraw.Draw(glow)
-    gd.ellipse([-420, -460, 820, 540], fill=(64, 28, 112))          # halo violet
-    gd.ellipse([w - 700, h - 520, w + 380, h + 360], fill=(74, 32, 12))  # halo orange
+    gd.ellipse([-420, -460, 820, 540], fill=(64, 28, 112))          # purple halo
+    gd.ellipse([w - 700, h - 520, w + 380, h + 360], fill=(74, 32, 12))  # orange halo
     gd.ellipse([w * 0.38, -340, w * 0.96, 300], fill=(44, 20, 84))
     glow = glow.filter(ImageFilter.GaussianBlur(200))
     im = Image.blend(im, glow, 0.88)
     d = ImageDraw.Draw(im, 'RGBA')
 
-    # globe en projection, en bas a droite
+    # projected globe, bottom right
     cx, cy, R = w * 0.82, h * 1.04, 580
     for k in range(-6, 7):
         a = k / 6.0
@@ -57,7 +57,7 @@ def background(w=1600, h=900):
         d.arc([cx - rr, y - rr * 0.16, cx + rr, y + rr * 0.16], 0, 360,
               fill=(178, 130, 255, 26), width=1)
 
-    # routes aeriennes
+    # air routes
     random.seed(7)
     for i in range(30):
         x1 = random.uniform(60, w - 60); y1 = random.uniform(70, h - 110)
@@ -84,15 +84,15 @@ def background(w=1600, h=900):
     dark = Image.new('RGB', (w, h), (14, 6, 27))
     return Image.composite(im, dark, v)
 
-# ─────────────────────────── marque MERIDIAN ───────────────────────────
+# ─────────────────────────── MERIDIAN mark ───────────────────────────
 def mark(size=384):
-    """Globe meridien traverse par une trajectoire ascendante. Dessin original."""
+    """Meridian globe crossed by a rising trajectory. Original drawing."""
     S = size * 3
     im = Image.new('RGBA', (S, S), (0, 0, 0, 0))
     c = S / 2
     R = S * 0.385
 
-    # disque : degrade violet profond vers violet clair
+    # disc: deep purple to light purple gradient
     disc = Image.new('RGBA', (S, S), (0, 0, 0, 0))
     dd = ImageDraw.Draw(disc)
     for i in range(int(R), 0, -1):
@@ -104,7 +104,7 @@ def mark(size=384):
     im.paste(disc, (0, 0), mask)
 
     d = ImageDraw.Draw(im)
-    # meridiens
+    # meridians
     for k in (0.32, 0.66):
         rr = R * k
         d.ellipse([c - rr, c - R, c + rr, c + R], outline=(226, 214, 255, 130),
@@ -116,7 +116,7 @@ def mark(size=384):
               width=max(2, S // 220))
     d.ellipse([c - R, c - R, c + R, c + R], outline=(255, 255, 255, 235), width=max(3, S // 110))
 
-    # trajectoire orange
+    # orange trajectory
     pts = []
     for t in [j / 70 for j in range(71)]:
         x = c - R * 1.20 + t * (R * 2.46)
@@ -141,7 +141,7 @@ def wordmark(w=640, h=150):
            font=_f(int(h * 0.40), False), fill=ORANGE + (255,))
     return im.resize((w, h), Image.LANCZOS)
 
-# ─────────────────────────── pixels et bandes ───────────────────────────
+# ─────────────────────────── pixels and bands ───────────────────────────
 def transparent(name, w=8, h=8):
     return save(Image.new('RGBA', (w, h), (0, 0, 0, 0)), name)
 
@@ -149,7 +149,7 @@ def accent(hexcol, name, w=64, h=8):
     c = tuple(int(hexcol.lstrip('#')[i:i + 2], 16) for i in (0, 2, 4))
     return save(Image.new('RGBA', (w, h), c + (255,)), name)
 
-# ─────────────────────────── icônes de rail ───────────────────────────
+# ─────────────────────────── rail icons ───────────────────────────
 def _icon(kind, size=128, on=True):
     S = size * 3
     im = Image.new('RGBA', (S, S), (0, 0, 0, 0))
@@ -157,34 +157,34 @@ def _icon(kind, size=128, on=True):
     c = ORANGE + (255,) if on else (150, 144, 180, 255)
     lw = max(4, S // 30)
     m = S * 0.17
-    if kind == 'pulse':          # réseau / vue d'ensemble : nœuds reliés
+    if kind == 'pulse':          # network / overview: linked nodes
         pts = [(0.5, 0.20), (0.20, 0.46), (0.80, 0.46), (0.32, 0.80), (0.68, 0.80)]
         for a, b in [(0, 1), (0, 2), (1, 3), (2, 4), (1, 2), (3, 4)]:
             d.line([pts[a][0] * S, pts[a][1] * S, pts[b][0] * S, pts[b][1] * S], fill=c, width=lw)
         for i, (px, py) in enumerate(pts):
             r = S * (0.075 if i == 0 else 0.048)
             d.ellipse([px * S - r, py * S - r, px * S + r, py * S + r], fill=c)
-    elif kind == 'plane':        # avion vu de dessus
+    elif kind == 'plane':        # aircraft from above
         d.polygon([(0.50, 0.10), (0.565, 0.30), (0.565, 0.44), (0.95, 0.63), (0.95, 0.72),
                    (0.565, 0.63), (0.565, 0.80), (0.68, 0.90), (0.68, 0.95), (0.50, 0.90),
                    (0.32, 0.95), (0.32, 0.90), (0.435, 0.80), (0.435, 0.63), (0.05, 0.72),
                    (0.05, 0.63), (0.435, 0.44), (0.435, 0.30)],
                   fill=c)
-    elif kind == 'hub':          # cible / hub avec anneaux
+    elif kind == 'hub':          # target / hub with rings
         for r in (0.42, 0.28):
             d.ellipse([S * (0.5 - r), S * (0.5 - r), S * (0.5 + r), S * (0.5 + r)], outline=c, width=lw)
         d.ellipse([S * 0.40, S * 0.40, S * 0.60, S * 0.60], fill=c)
         for a in range(0, 360, 90):
             x = 0.5 + 0.50 * math.cos(math.radians(a)); y = 0.5 + 0.50 * math.sin(math.radians(a))
             d.line([S * 0.5, S * 0.5, S * x, S * y], fill=c, width=max(2, lw // 2))
-    elif kind == 'truck':        # camion de livraison
+    elif kind == 'truck':        # delivery truck
         d.rounded_rectangle([S * 0.06, S * 0.32, S * 0.58, S * 0.68], radius=S * 0.04, fill=c)
         d.polygon([(S * 0.58, S * 0.40), (S * 0.78, S * 0.40), (S * 0.92, S * 0.54),
                    (S * 0.92, S * 0.68), (S * 0.58, S * 0.68)], fill=c)
         for cx in (0.26, 0.76):
             d.ellipse([S * (cx - 0.10), S * 0.62, S * (cx + 0.10), S * 0.82], fill=c)
             d.ellipse([S * (cx - 0.045), S * 0.675, S * (cx + 0.045), S * 0.765], fill=(10, 9, 18, 255))
-    elif kind == 'leaf':         # feuille / climat
+    elif kind == 'leaf':         # leaf / climate
         d.polygon([(0.50 * S, 0.08 * S), (0.86 * S, 0.42 * S), (0.62 * S, 0.90 * S),
                    (0.38 * S, 0.90 * S), (0.14 * S, 0.42 * S)], fill=c)
         d.line([0.5 * S, 0.14 * S, 0.5 * S, 0.90 * S], fill=(10, 9, 18, 255), width=lw)
@@ -193,13 +193,13 @@ def _icon(kind, size=128, on=True):
                    fill=(10, 9, 18, 255), width=max(2, lw - 2))
             d.line([0.5 * S, t * S, (0.5 - 0.24 * (1 - t)) * S - 0.10 * S, (t - 0.13) * S],
                    fill=(10, 9, 18, 255), width=max(2, lw - 2))
-    elif kind == 'bolt':         # energie : eclair dans un hexagone
+    elif kind == 'bolt':         # energy: bolt in a hexagon
         d.polygon([(0.50 * S, 0.04 * S), (0.90 * S, 0.27 * S), (0.90 * S, 0.73 * S),
                    (0.50 * S, 0.96 * S), (0.10 * S, 0.73 * S), (0.10 * S, 0.27 * S)],
                   outline=c, width=lw)
         d.polygon([(0.56 * S, 0.18 * S), (0.30 * S, 0.54 * S), (0.47 * S, 0.54 * S),
                    (0.42 * S, 0.84 * S), (0.70 * S, 0.46 * S), (0.53 * S, 0.46 * S)], fill=c)
-    elif kind == 'chart':        # finance : colonnes + flèche
+    elif kind == 'chart':        # finance: columns + arrow
         for i, (hh, ww) in enumerate([(0.30, 0.16), (0.50, 0.16), (0.72, 0.16)]):
             x = 0.12 + i * 0.24
             d.rounded_rectangle([S * x, S * (0.90 - hh), S * (x + ww), S * 0.90],
@@ -208,12 +208,12 @@ def _icon(kind, size=128, on=True):
         d.polygon([(S * 0.92, S * 0.08), (S * 0.74, S * 0.08), (S * 0.86, S * 0.22)], fill=c)
     return im.resize((size, size), Image.LANCZOS)
 
-# ─────────────────────────── silhouettes d'appareils ───────────────────────────
+# ─────────────────────────── aircraft silhouettes ───────────────────────────
 def aircraft(kind, w=200, h=200, colr=None):
-    """Silhouette d'avion cargo vue de dessus, nez en haut. Dessin paramétrique original.
+    """Cargo aircraft silhouette seen from above, nose up. Original parametric drawing.
 
-    Chaque famille a ses proportions : elancement du fuselage, envergure, fleche,
-    nombre de nacelles, helices. Aucune image ni marque n'est reproduite.
+    Each family has its own proportions: fuselage slenderness, span, sweep,
+    number of nacelles, propellers. No image or trademark is reproduced.
     """
     S = 4
     W, Hh = w * S, h * S
@@ -245,7 +245,7 @@ def aircraft(kind, w=200, h=200, colr=None):
     fw = W * P['fw'] / 2
     Y = lambda t: y0 + L * t
 
-    # ── voilure : trapeze en fleche
+    # ── wing: swept trapezoid
     wy = Y(P['wy'])
     span = W * P['sp'] / 2
     ch = L * P['ch']
@@ -256,7 +256,7 @@ def aircraft(kind, w=200, h=200, colr=None):
                    (cx + sgn * span, wy + sw + ch * 0.34),
                    (cx + sgn * fw * 0.9, wy + ch)], fill=c2)
 
-    # ── empennage horizontal
+    # ── horizontal stabiliser
     ty = Y(0.885)
     tspan = W * P['ts'] / 2
     tch = L * 0.085
@@ -266,7 +266,7 @@ def aircraft(kind, w=200, h=200, colr=None):
                    (cx + sgn * tspan, ty + tch * 1.45),
                    (cx + sgn * fw * 0.8, ty + tch * 1.30)], fill=c2)
 
-    # ── fuselage : capsule effilee au nez, affinee a la queue
+    # ── fuselage: capsule tapered at the nose, narrowed at the tail
     pts_l, pts_r = [], []
     N = 40
     for i in range(N + 1):
@@ -281,15 +281,15 @@ def aircraft(kind, w=200, h=200, colr=None):
         pts_r.append((cx + r, Y(t)))
     d.polygon(pts_l + pts_r[::-1], fill=c)
 
-    # ── derive vue de dessus : losange fin sur l'axe, a l'arriere
+    # ── fin seen from above: thin diamond on the axis, at the rear
     d.polygon([(cx, Y(0.80)), (cx + fw * 0.52, Y(0.925)),
                (cx, Y(0.995)), (cx - fw * 0.52, Y(0.925))], fill=c2)
 
-    # ── moteur central (trijet) : bulbe a la base de la derive
+    # ── centre engine (trijet): bulge at the base of the fin
     if P['tri']:
         d.ellipse([cx - fw * 0.46, Y(0.945), cx + fw * 0.46, Y(1.02)], fill=c2)
 
-    # ── nacelles ou turbopropulseurs
+    # ── nacelles or turboprops
     for off in P['eng']:
         for sgn in (-1, 1):
             ex = cx + sgn * span * off
@@ -304,21 +304,21 @@ def aircraft(kind, w=200, h=200, colr=None):
                                     radius=fw * 0.36, fill=c2)
                 d.ellipse([ex - fw * 0.30, ey - L * 0.040, ex + fw * 0.30, ey + L * 0.005], fill=dark)
 
-    # ── helice de nez
+    # ── nose propeller
     if P['prop'] == 'nose':
         d.line([cx - span * 0.34, Y(0.030), cx + span * 0.34, Y(0.030)],
                fill=c2, width=max(3, int(Hh * 0.010)))
 
-    # ── verriere
+    # ── canopy
     d.polygon([(cx - fw * 0.55, Y(0.115)), (cx, Y(0.055)), (cx + fw * 0.55, Y(0.115)),
                (cx + fw * 0.40, Y(0.165)), (cx - fw * 0.40, Y(0.165))], fill=dark)
-    # ── porte cargo laterale
+    # ── side cargo door
     d.rounded_rectangle([cx + fw * 0.30, Y(0.30), cx + fw * 0.92, Y(0.45)],
                         radius=fw * 0.10, outline=dark, width=max(2, int(Hh * 0.006)))
     return im.resize((w, h), Image.LANCZOS)
 
 
-# ─────────────────────────── barre de progression ───────────────────────────
+# ─────────────────────────── progress bar ───────────────────────────
 def gauge(pct, w=360, h=26, col=None, bg=(38, 34, 66)):
     S = 3
     im = Image.new('RGBA', (w * S, h * S), (0, 0, 0, 0))
@@ -346,10 +346,10 @@ def build(outdir):
     return names
 
 
-# ─────────────────────────── carte du réseau ───────────────────────────
+# ─────────────────────────── network map ───────────────────────────
 def network_map(hubs, w=944, h=540, lon0=-170, lon1=158, lat0=-46, lat1=76,
                 bubbles=True, labels=True):
-    """Planisphère en points + routes aériennes réelles. Dessin original, aucune tuile importée."""
+    """Dot-matrix planisphere + real air routes. Original drawing, no imported tile."""
     from global_land_mask import globe
     S = 2
     W, H = w * S, h * S
@@ -427,9 +427,9 @@ def network_map(hubs, w=944, h=540, lon0=-170, lon1=158, lat0=-46, lat1=76,
         d.ellipse([x - rr * 0.40, y - rr * 0.40, x + rr * 0.40, y + rr * 0.40],
                   fill=(255, 244, 232, 255))
 
-    # Etiquettes placees par essais successifs : chaque nom prend la premiere position
-    # libre autour de son hub. Aucune ne peut donc en recouvrir une autre, ni tomber sur
-    # un autre hub : c'est la grappe americaine (huit hubs serres) qui l'imposait.
+    # Labels placed by successive trials: each name takes the first free position
+    # around its hub. None can therefore cover another, or land on another hub:
+    # the American cluster (eight tight hubs) is what forced this.
     LAB = {'Memphis SuperHub': 'MEMPHIS', 'Indianapolis Hub': 'INDIANAPOLIS',
            'Newark': 'NEWARK', 'Miami Gateway': 'MIAMI',
            'Fort Worth Alliance': 'FORT WORTH', 'Oakland': 'OAKLAND',
@@ -437,9 +437,9 @@ def network_map(hubs, w=944, h=540, lon0=-170, lon1=158, lat0=-46, lat1=76,
            'Liege': 'LIEGE', 'Guangzhou': 'GUANGZHOU', 'Osaka': 'OSAKA',
            'Chicago': 'CHICAGO', 'Los Angeles': 'LOS ANGELES', 'Atlanta': 'ATLANTA'}
     f = _f(int(W / 66))
-    fh = W / 52                       # hauteur de ligne
-    pad = W / 260                     # marge autour du hub
-    taken = []                        # boites deja posees
+    fh = W / 52                       # line height
+    pad = W / 260                     # margin around the hub
+    taken = []                        # boxes already placed
     marks = [px(la, lo) for _, la, lo, _, _ in hubs]
 
     def free(bx):
@@ -449,12 +449,12 @@ def network_map(hubs, w=944, h=540, lon0=-170, lon1=158, lat0=-46, lat1=76,
         for t in taken:
             if x0 < t[2] + pad and t[0] < x1 + pad and y0 < t[3] + pad and t[1] < y1 + pad:
                 return False
-        for mxp, myp in marks:          # ne jamais poser une etiquette sur un hub
+        for mxp, myp in marks:          # never place a label on a hub
             if x0 - pad < mxp < x1 + pad and y0 - pad < myp < y1 + pad:
                 return False
         return True
 
-    # du plus gros hub au plus petit : les grands noms se placent en premier
+    # largest hub down to smallest: the big names are placed first
     for name, la, lo, cap, tier in (sorted(hubs, key=lambda r: -r[3]) if labels else []):
         if name not in LAB:
             continue
@@ -526,9 +526,9 @@ def network_map(hubs, w=944, h=540, lon0=-170, lon1=158, lat0=-46, lat1=76,
     return im.resize((w, h), Image.LANCZOS)
 
 
-# ─────────────────────────── icônes de KPI ───────────────────────────
+# ─────────────────────────── KPI icons ───────────────────────────
 def kpi_icon(kind, size=96, col=None):
-    """Pictogramme original par indicateur, tracé au trait épais."""
+    """Original pictogram per indicator, drawn in heavy stroke."""
     S = size * 4
     im = Image.new('RGBA', (S, S), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
@@ -536,11 +536,11 @@ def kpi_icon(kind, size=96, col=None):
     lw = max(3, int(S * 0.055))
     P = lambda *v: [x * S for x in v]
 
-    if kind == 'plane':                      # avion vu de dessus
+    if kind == 'plane':                      # aircraft from above
         d.polygon(P(0.50,0.06, 0.575,0.30, 0.575,0.44, 0.96,0.63, 0.96,0.73, 0.575,0.62,
                     0.575,0.82, 0.70,0.92, 0.70,0.97, 0.50,0.90, 0.30,0.97, 0.30,0.92,
                     0.425,0.82, 0.425,0.62, 0.04,0.73, 0.04,0.63, 0.425,0.44, 0.425,0.30), fill=c)
-    elif kind == 'parcel':                   # colis
+    elif kind == 'parcel':                   # parcel
         d.polygon(P(0.50,0.08, 0.92,0.30, 0.50,0.52, 0.08,0.30), fill=c)
         d.polygon(P(0.08,0.34, 0.48,0.56, 0.48,0.94, 0.08,0.72), fill=c)
         d.polygon(P(0.92,0.34, 0.92,0.72, 0.52,0.94, 0.52,0.56), fill=c[:3] + (170,))
@@ -562,30 +562,30 @@ def kpi_icon(kind, size=96, col=None):
         d.ellipse(P(0.74,0.20,0.94,0.40), fill=c[:3] + (180,))
         d.pieslice(P(0.00,0.46,0.30,0.92), 180, 360, fill=c[:3] + (180,))
         d.pieslice(P(0.70,0.46,1.00,0.92), 180, 360, fill=c[:3] + (180,))
-    elif kind == 'weight':                   # charge utile : haltere
+    elif kind == 'weight':                   # payload: dumbbell
         d.rounded_rectangle(P(0.22,0.44,0.78,0.56), radius=S*0.03, fill=c)
         for x in (0.06, 0.78):
             d.rounded_rectangle(P(x,0.26,x+0.16,0.74), radius=S*0.05, fill=c)
         for x in (0.00, 0.94):
             d.rounded_rectangle(P(x,0.36,x+0.06,0.64), radius=S*0.03, fill=c[:3]+(190,))
-    elif kind == 'scale':                    # moyenne / balance
+    elif kind == 'scale':                    # average / scales
         d.line(P(0.50,0.10,0.50,0.86), fill=c, width=lw)
         d.line(P(0.16,0.28,0.84,0.28), fill=c, width=lw)
         d.line(P(0.28,0.86,0.72,0.86), fill=c, width=lw)
         d.arc(P(0.02,0.16,0.34,0.48), 0, 180, fill=c, width=lw)
         d.arc(P(0.66,0.16,0.98,0.48), 0, 180, fill=c, width=lw)
-    elif kind == 'factory':                  # constructeur
+    elif kind == 'factory':                  # manufacturer
         d.polygon(P(0.06,0.92, 0.06,0.46, 0.34,0.62, 0.34,0.46, 0.62,0.62, 0.62,0.20,
                     0.94,0.20, 0.94,0.92), fill=c)
         d.rectangle(P(0.16,0.66,0.26,0.80), fill=(20,8,38,255))
         d.rectangle(P(0.44,0.66,0.54,0.80), fill=(20,8,38,255))
         d.rectangle(P(0.72,0.44,0.84,0.62), fill=(20,8,38,255))
-    elif kind == 'key':                      # propriété
+    elif kind == 'key':                      # ownership
         d.ellipse(P(0.06,0.30,0.46,0.70), outline=c, width=lw)
         d.line(P(0.42,0.50,0.94,0.50), fill=c, width=lw)
         d.line(P(0.74,0.50,0.74,0.74), fill=c, width=lw)
         d.line(P(0.90,0.50,0.90,0.70), fill=c, width=lw)
-    elif kind == 'order':                    # carnet de commandes
+    elif kind == 'order':                    # order book
         d.rounded_rectangle(P(0.10,0.16,0.90,0.92), radius=S*0.06, outline=c, width=lw)
         d.line(P(0.10,0.36,0.90,0.36), fill=c, width=lw)
         d.line(P(0.30,0.06,0.30,0.26), fill=c, width=lw)
@@ -597,22 +597,22 @@ def kpi_icon(kind, size=96, col=None):
         d.rectangle(P(0.34,0.56,0.66,0.92), fill=(20,8,38,255))
         d.rectangle(P(0.14,0.52,0.26,0.68), fill=(20,8,38,255))
         d.rectangle(P(0.74,0.52,0.86,0.68), fill=(20,8,38,255))
-    elif kind == 'sort':                     # convoyeur de tri
+    elif kind == 'sort':                     # sorting conveyor
         d.rounded_rectangle(P(0.04,0.58,0.96,0.74), radius=S*0.05, fill=c)
         for cx in (0.16, 0.38, 0.60, 0.82):
             d.ellipse(P(cx-0.07,0.74,cx+0.07,0.88), outline=c, width=max(2, lw-2))
         d.rectangle(P(0.14,0.34,0.36,0.56), fill=c)
         d.rectangle(P(0.46,0.20,0.66,0.56), fill=c[:3]+(180,))
         d.rectangle(P(0.74,0.40,0.92,0.56), fill=c[:3]+(180,))
-    elif kind == 'area':                     # surface au sol
+    elif kind == 'area':                     # floor area
         d.rectangle(P(0.08,0.08,0.92,0.92), outline=c, width=lw)
         d.line(P(0.08,0.08,0.92,0.92), fill=c[:3]+(150,), width=max(2, lw-2))
         d.line(P(0.08,0.42,0.42,0.08), fill=c[:3]+(120,), width=max(2, lw-3))
         d.line(P(0.58,0.92,0.92,0.58), fill=c[:3]+(120,), width=max(2, lw-3))
-    elif kind == 'land':                     # terrain
+    elif kind == 'land':                     # land
         d.polygon(P(0.04,0.72, 0.36,0.46, 0.62,0.66, 0.96,0.34, 0.96,0.92, 0.04,0.92), fill=c)
         d.ellipse(P(0.68,0.10,0.90,0.32), fill=c[:3]+(170,))
-    elif kind == 'tower':                    # tour de contrôle
+    elif kind == 'tower':                    # control tower
         d.polygon(P(0.36,0.92, 0.42,0.42, 0.58,0.42, 0.64,0.92), fill=c)
         d.polygon(P(0.28,0.42, 0.36,0.22, 0.64,0.22, 0.72,0.42), fill=c)
         d.line(P(0.50,0.22,0.50,0.04), fill=c, width=lw)
@@ -623,7 +623,7 @@ def kpi_icon(kind, size=96, col=None):
         for cx in (0.24, 0.76):
             d.ellipse(P(cx-0.11,0.64,cx+0.11,0.86), fill=c)
             d.ellipse(P(cx-0.05,0.70,cx+0.05,0.80), fill=(20,8,38,255))
-    elif kind == 'plug':                     # véhicule électrique
+    elif kind == 'plug':                     # electric vehicle
         d.rounded_rectangle(P(0.28,0.30,0.72,0.72), radius=S*0.06, fill=c)
         d.line(P(0.40,0.30,0.40,0.08), fill=c, width=lw)
         d.line(P(0.60,0.30,0.60,0.08), fill=c, width=lw)
@@ -639,21 +639,21 @@ def kpi_icon(kind, size=96, col=None):
         for yy in (0.54, 0.70, 0.84):
             for xx in (0.60, 0.76):
                 d.rectangle(P(xx,yy,xx+0.08,yy+0.06), fill=(20,8,38,255))
-    elif kind == 'pallet':                   # fret palettisé
+    elif kind == 'pallet':                   # palletised freight
         d.rectangle(P(0.10,0.72,0.90,0.82), fill=c)
         d.rectangle(P(0.14,0.82,0.24,0.92), fill=c)
         d.rectangle(P(0.45,0.82,0.55,0.92), fill=c)
         d.rectangle(P(0.76,0.82,0.86,0.92), fill=c)
         d.rectangle(P(0.20,0.36,0.52,0.70), fill=c[:3]+(210,))
         d.rectangle(P(0.56,0.20,0.84,0.70), fill=c[:3]+(160,))
-    elif kind == 'cloud':                    # émissions
+    elif kind == 'cloud':                    # emissions
         d.ellipse(P(0.06,0.34,0.44,0.72), fill=c)
         d.ellipse(P(0.28,0.20,0.72,0.64), fill=c)
         d.ellipse(P(0.56,0.36,0.94,0.72), fill=c)
         d.rectangle(P(0.16,0.54,0.84,0.72), fill=c)
         for xx in (0.26, 0.48, 0.70):
             d.line(P(xx,0.80,xx-0.06,0.94), fill=c[:3]+(190,), width=lw)
-    elif kind == 'gauge':                    # intensité
+    elif kind == 'gauge':                    # intensity
         d.arc(P(0.04,0.16,0.96,1.08), 180, 360, fill=c, width=lw)
         d.line(P(0.50,0.62,0.24,0.34), fill=c, width=lw)
         d.ellipse(P(0.42,0.54,0.58,0.70), fill=c)
@@ -661,15 +661,15 @@ def kpi_icon(kind, size=96, col=None):
             x1 = 0.50 + 0.40 * math.cos(math.radians(a)); y1 = 0.62 + 0.40 * math.sin(math.radians(a))
             x2 = 0.50 + 0.32 * math.cos(math.radians(a)); y2 = 0.62 + 0.32 * math.sin(math.radians(a))
             d.line(P(x1,y1,x2,y2), fill=c[:3]+(170,), width=max(2, lw-2))
-    elif kind == 'chain':                    # chaîne d'approvisionnement
+    elif kind == 'chain':                    # supply chain
         for cx in (0.22, 0.50, 0.78):
             d.ellipse(P(cx-0.16,0.34,cx+0.16,0.66), outline=c, width=lw)
         d.line(P(0.36,0.50,0.36,0.50), fill=c, width=lw)
-    elif kind == 'fuel':                     # carburant durable
+    elif kind == 'fuel':                     # sustainable fuel
         d.polygon(P(0.50,0.06, 0.86,0.50, 0.86,0.72, 0.50,0.94, 0.14,0.72, 0.14,0.50), fill=c)
         d.polygon(P(0.50,0.28, 0.34,0.54, 0.46,0.54, 0.40,0.76, 0.66,0.46, 0.54,0.46),
                   fill=(20,8,38,255))
-    elif kind == 'bolt':                     # energie
+    elif kind == 'bolt':                     # energy
         d.polygon(P(0.50,0.04, 0.90,0.27, 0.90,0.73, 0.50,0.96, 0.10,0.73, 0.10,0.27),
                   outline=c, width=lw)
         d.polygon(P(0.56,0.18, 0.30,0.54, 0.47,0.54, 0.42,0.84, 0.70,0.46, 0.53,0.46), fill=c)
@@ -690,18 +690,18 @@ def kpi_icon(kind, size=96, col=None):
         d.arc(P(0.10,0.54,0.90,0.92), 0, 180, fill=c, width=lw)
         d.line(P(0.10,0.55,0.10,0.73), fill=c, width=lw)
         d.line(P(0.90,0.55,0.90,0.73), fill=c, width=lw)
-    elif kind == 'share':                    # bénéfice par action
+    elif kind == 'share':                    # earnings per share
         d.rounded_rectangle(P(0.10,0.10,0.90,0.90), radius=S*0.08, outline=c, width=lw)
         d.line(P(0.24,0.68,0.42,0.46,0.58,0.58,0.78,0.28), fill=c, width=lw)
         d.ellipse(P(0.72,0.22,0.84,0.34), fill=c)
-    elif kind == 'invest':                   # investissement
+    elif kind == 'invest':                   # investment
         d.polygon(P(0.50,0.06, 0.62,0.34, 0.92,0.34, 0.68,0.54, 0.78,0.86, 0.50,0.66,
                     0.22,0.86, 0.32,0.54, 0.08,0.34, 0.38,0.34), fill=c)
     return im.resize((size, size), Image.LANCZOS)
 
 
 def fedex_logo(src, w=300, h=84, pad=0.10):
-    """Prépare le logo fourni par l'utilisateur : rognage des marges, pastille blanche."""
+    """Prepares the logo supplied by the user: margin trim, white pill."""
     im = Image.open(src).convert('RGB')
     g = im.convert('L')
     bbox = g.point(lambda v: 255 if v < 245 else 0).getbbox()
